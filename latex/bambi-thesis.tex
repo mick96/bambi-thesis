@@ -35,7 +35,7 @@
 %\usepackage[showframe,headsep=.5cm,headheight=1cm]{geometry}
 %\usepackage[showframe,headsep=.5cm,headheight=1cm,]{geometry}
 %\usepackage[headings]{fullpage}
-\usepackage[headsep=.5cm,headheight=1cm,left=2.5cm,right=2.5cm,top=3cm,bottom=2.5cm]{geometry}
+\usepackage[headsep=.5cm,headheight=1cm,left=3cm,right=2cm,top=3cm,bottom=2.5cm]{geometry}
 
 \providecommand{\keywords}[1]{\textbf{\textit{Keywords: }} #1}
 \def\UrlBreaks{\do\/\do-}
@@ -94,18 +94,18 @@
 %\keywords{}
 
 
-\hypersetup{pageanchor=true}
 \thispagestyle{empty}
 \cleardoublepage
 
+\hypersetup{pageanchor=true}
+\pagestyle{plain}
 
 
 \tableofcontents
 
-\newpage
-
+\cleardoublepage
+\pagestyle{fancy}
 \pagenumbering{arabic}
-
 \renewcommand{\thechapter}{\Roman{chapter}}
 \renewcommand*\thesection{\arabic{section}}
 
