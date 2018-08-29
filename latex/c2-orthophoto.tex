@@ -1,0 +1,25 @@
+%!TEX root = bambi-thesis.tex
+In this chapter it is explained in details how the device obtain the information of the field boundary in form of a list of geographic coordinates.
+This important task will define the mission range of action which is used as input to the Coverage Path Planning module. It is thus important that the gathered information are precise and consistent or it will impact the successive steps of the mission.\\
+The process could be divided in two tasks:
+\begin{itemize}
+	\item Obtain a georeferenced photo displaying the entire meadow.
+	\item Detect and trace the field boundary over the georeferenced image.
+	\item Store the boundary as a set of geographic coordinate points.
+\end{itemize}
+
+\section{Georeferencing a Photo} % (fold)
+\label{sec:georeferenced_photo}
+Before an aerial image can be used to support a site-specific application it is essential to perform the geometric corrections and geocoding. This is commonly called \textit{georeferencing} which enables the assignment of ground coordinates to the different features in the datasets. If the map projection (and map projection parameters) of the ground coordinates are known, equivalent geographic coordinates can be produced which enables positioning the features of the coverage into a World context. \cite{georefPractice}.
+For this specific use case the final result is an image where every point it is associated to a geographic coordinate.
+
+\subsection{Theory Background} % (fold)
+\label{sub:theory_background}
+
+% subsection theory_background (end)
+
+%DA USARE QUANDO PARLO DI GOOLGE MAPS E PER LA PRECISIONE ECC... e magari cosi' introduco l'idea dell'orthophoto per migliorare la precisione
+Spatial datasets, like any type of data, are prone to errors. Thus, three fundamental concepts have to be kept in mind – precision, bias and accuracy. Precision refers to the dispersion of positional random errors and it is usually expressed by a standard deviation. Bias, on the other hand, is associated with systematic errors and is usually measured by an average error that ideally should equal zero. Accuracy depends on both precision and bias and defines how close features on the map are from their true positions on the ground [6]. So, despite being frequently confused concepts, high precision does not necessarily mean high accuracy. But both depend greatly on the map scale. All maps have inherent positional errors, which depend on the methods used in the construction of the map. The scale is the ratio between a distance on the map and the corresponding distance on the ground. The maximum acceptable positional error (established by cartographic standards) is determined by the map scale.
+% section georeferenced_photo (end)
+
+Fist of all a georeferenced photo containing the whole field is 
