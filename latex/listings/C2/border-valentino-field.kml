@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Shapes</name>
+    <Style id="thickLine">
+      <LineStyle>
+        <width>2.5</width>
+      </LineStyle>
+    </Style>
+    <Style id="transparent50Poly">
+      <PolyStyle>
+        <color>7fffffff</color>
+      </PolyStyle>
+    </Style>
+    <Placemark>
+      <name>Waldpeter Field Boundary</name>
+      <description>Field Border</description>
+      <LineString>
+        <coordinates>
+          11.491609399895651,46.453469568513725,0 
+          11.491755810622863,46.45338389393535,0 
+          <!-- OMITTED COORDINATES -->
+           11.49140555201052,46.45356658266721,0 
+           11.491609399895651,46.453469568513725,0 
+         </coordinates>
+      </LineString>
+      <styleUrl>#thickLine</styleUrl>
+    </Placemark>
+  </Document>
+</kml>
