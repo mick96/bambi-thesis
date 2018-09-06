@@ -96,10 +96,14 @@ An example of a field contour encoded in KML code is reported in \autoref{list:b
 
 \lstinputlisting[label=list:border-KML, caption=Border in KML, language=XML]{listings/C2/border-valentino-field.kml}
 
-\todo{Spiegare come e' fatto il codice KML}
-Using the \textit{name} and \textit{description} tags KML gives the possibility to add meta-data to the geographic feature. This comes in handy to classify the field and creating a database of the place already visited. The idea is to use the data already collected when repeating mission in a previously scanned field.
-
-\todo{add image of the field contour}
+Using the \textit{name} and \textit{description} tags gives the possibility to add meta-data to the KML geographic feature. This comes in handy to classify the field and creating a database of the place already visited. The idea is then to use the data already collected when repeating mission in a previously scanned field.
+Before entering in the implementation details an example of how the contour appears in Google Earth is displayed in \autoref{fig:waldpeter-boundary-GE}.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/C2/waldpeter-boundary-GE.png}
+    \caption{KML LineString geographic feature visualize on Google Earth}
+    \label{fig:waldpeter-boundary-GE}
+\end{figure}
 
 \section{Implementation} % (fold)
 \label{sec:implementation}
@@ -134,7 +138,7 @@ Once the socket is connected it is possible to send a several different command 
 The first task of the node is to trigger the camera shutter when requested by the mission controller. The image is fetched and downloaded to the internal storage of the Raspberry, as soon as the camera sends back the message which tells it has successfully taken the photo. All this logic is implemented in the function \textit{take\_photo} listed in \autoref{list:camera_photo}. Most of the credits goes to Res Andy for its great effort in reverse engineering the Yi Cam remote control protocol and to provide sample scripts in python. \cite{YiCamGit}
 Along with the trigger command, the node continuously listen to the topic \textit{/mavros/global\_position/global} where mavros node publishes the global position communicated by the flight controller (GPS fix). In this way the node has the necessary information to geo-tag the photo.
 Once the photo is geotagged and made available locally on the onboard computer the \textit{optical\_cam} node would be in charge of generating the orthophoto. This part, at first place, has been omitted and ??leaved?? to future developments.
-\pagebreak
+% \pagebreak
 \lstinputlisting[label=list:camera_photo, caption=take\_photo() function in python, language=python]{listings/C2/camera_photo.py}
 % subsubsection optical_cam (end)
 

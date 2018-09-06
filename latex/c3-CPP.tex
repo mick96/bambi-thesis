@@ -1,20 +1,24 @@
 %!TEX root = bambi-thesis.tex
-Breve intro al problema
 
-\section{CPP Algorithms} % (fold)
-\label{sec:cpp_algorithms}
+\textit{Coverage path planning} (CPP) is the problem of finding a trajectory for a mobile robot such that a target area is completely swept by the sensor footprint. In the following section it is first presented the conventional CPP algorithms in use for mobile robots. Later, the focus moves more specifically over aerial application showing some previous work regarding this topic.
 
-% section implementation_in_ros (end)
+
+\section{Theory Background} % (fold)
+\label{sec:theory_background}
+Here a quite extensive explanation of the existing CPP algorithms will be done.
+
+\subsection{Flight Altitude} % (fold)
+\label{sub:flight_altitude}
+How to compute the required flight altitude (resolution + sensor footprint + required photo overlap). Some calculation will be listed.
+% subsection flight_altitude (end
+
+
+% section theory_background (end)
 
 \section{Proposal Solution} % (fold)
 \label{sec:proposal_solution}
-\subsection{Flight Altitude} % (fold)
 
-Come abbiamo calcolato l-altitudine a cui volare (required resolutiion + sensor footprint)
-\label{sub:flight_altitude}
-
-% subsection flight_altitude (end)
-Abbiamos celto il wavefront perch[ oltre ad essere abbastanza efficente computazionalmente permette di tenere conto di diverse cost function (diverse priorita' come ad esempio l'altitudine, minor number of turns, ecc...)]
+Abbiamo scelto il wavefront perche' oltre ad essere abbastanza efficente computazionalmente permette di tenere conto di diverse cost function (diverse priorita' come ad esempio l'altitudine, minor number of turns, ecc...)]
 % section proposal_solution (end)
 
 
