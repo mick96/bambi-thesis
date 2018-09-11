@@ -110,8 +110,8 @@ Before entering in the implementation details an example of how the contour appe
 As it was accennato in \ref{sub:ortho_rectification} although the source of the orthophoto used in the software implementation is Google Earth, in defining the mission it has been taken into account the possibility to ??shut?? a photo of the whole field and georeference it (that is the goal of \textit{/optical\_cam} node). This would provide a ??more?? up-to-dated and eventually more accurate image, but at the same time the orthophoto generation is computationally heavy especially for a mini PC. This in addition to the limited flight time of the quadcopter suggest to use Google imagery database.
 In the following section it is explained how this part of the mission has been implemented in ROS. The most relevant part concerns the representation of the field contour as ROS message and the way to import it given the respective KML file.
 
-\subsection{subsection name} % (fold)
-\label{sub:subsubsection_name}
+\subsection{ROS Nodes} % (fold)
+\label{sub:ros_nodes}
 \autoref{fig:field-detection-rqt} shows how the three ROS nodes (\textit{/mission\_controller},\textit{/optical\_cam} and \textit{/mission\_controller}, \textit{/boundary\_generator} and ), displayed as ovals, communicate together through the four topics represented inside rectangles. The node named \textit{/mavros} (for more details see appendix \ref{appendix:mavros}) on the left side of the diagram, manages everything regarding the communication with the aircraft. It basically provide a ROS interface to read the vehicle status variables and to change the flight controller behaviors.
 \begin{figure}[ht]
     \centering
@@ -149,17 +149,18 @@ The \textit{/boundary\_generator}'s goal is, when requested, to publish ROS mess
 In the following implementation the boundary information is taken from a KML file containing the geographic path manually generated through Google Earth. It has been decided to make a separated for this simple parsing task so that in future it will be ready to hold any image processing algorithm to autonomously extrapolate the field outline from the orthophoto.
 The code of this node is integrally reported in \autoref{list:boundary_generator}.\\
 First of all the node subscribes to \textit{/mission\_controller/trigger\_boundary} in such a way that upon the arrival of a trigger message the callback function \textit{cb\_boundary\_trigger} is called. The callback function get the absolute path of the KML file from the message attribute \textit{filenameWithFullPath}. Now it comes to play the pyKML library.\\
-pyKML is a Python package for creating, parsing, manipulating, and validating KML documents. It is based on the \textit{lxml.objectify} API \footnote{It aims to hide the usage of XML behind normal Python objects, sometimes referred to as data-binding. It allows you to use XML as if you were dealing with a normal Python object hierarchy.\cite{lxml}} which provides access to XML documents in python program. Once the file has been opened it is possible to access to KML child member in the fashion shown at line 23 \todo{assicurarsi si possa riferirsi cosi'}. At this point it is just a matter of parsing each geographic point as it was a string in the form "<latitude>, <longitude>" using the function \textit{split(',')}.
+pyKML is a Python package for creating, parsing, manipulating, and validating KML documents. It is based on the \textit{lxml.objectify} API \footnote{It aims to hide the usage of XML behind normal Python objects, sometimes referred to as data-binding. It allows you to use XML as if you were dealing with a normal Python object hierarchy.\cite{lxml}} which provides access to XML documents in python program. Once the file has been opened it is possible to access to KML child member in the way shown at line 23 \todo{assicurarsi si possa riferirsi cosi'}. At this point it is just a matter of parsing each geographic point as it was a string in the form "<latitude>, <longitude>" using the function \textit{split(',')}.
 Latitude and longitude coordinate for each point of the contour is then packed in a geoPosition2D object which is push back on the boudary\_path vector. Once every point has been parsed and the vector filled the \textit{Field} ROS message is published completing the node's job.
 \lstinputlisting[label=list:boundary_generator, caption=boundary generator
  node in python, language=python]{listings/C2/boundary_generator.py}.
 
-
 % subsubsection boundary_generator (end)
+
+% subsubsection ros_nodes (end)
 
 % because there is not an explanation for explain this. I have tryed to explained the most safe way to preserve the deers but the problem is all that I am not capable to explain what is happening in to myself . i trust of myself but one part of my think about the life it is not so much easy for think that i am really capable to talk about something. so finally i think that i must stop
 %  my self to try to find some origins about something when I am not capable to talk about me, this thesis is another why to try to discover  about something that it is outward rather than something that are inside me. most of people are used to talk about different things around the world because for every man it is easier to talk about something that no concern about it self. they were more years that the most part of people thinks only about everything that concerns the world outside. the fact is that it is so difficult talk about himself. this is the reason why everybody tryes to write a test that no concern about himself. il fatto è mike che studiando tutto cio mche compete il mondo tu inevitabilmente perderai parte di te stesso. come evitare cio ricorda in ogni cosa di fermarti, respirare, e sentire te stesso. annusati come faresti con un profumo nuovo. comprendi ogni cellula di te stesso per comprendere cio che ami e vuoi. e così avverra che in ogni cosa in cui ti dedicherai ilcentro non sara perdibile poiche sara sempre la parte di te che in quel momento deciderai di far uscire, esprimere e essere.
-% subsubsection subsubsection_name (end)
+
 % subsection field_border_in_kml (end)
 
 

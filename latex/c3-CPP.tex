@@ -1,8 +1,15 @@
 %!TEX root = bambi-thesis.tex
 This chapter begins with a theory digression about the topic of Coverage Path Planning. Then the algorithm chosen for the application in this thesis is explained in details and finally the ROS implementation of the algorithm is presented and discussed.
+\section{Problem Definition} % (fold)
+\label{sec:problem_definition}
+The area coverage problem can be abstractly described as follow:\par 
+\textit{Given} a convex or non convex shaped area $A \subset \mathbb{R}^2$ decomposed approximately by a finite set of regular cells $C = \{c_1, .., c_n\}$ such that, $A \approx \bigcup_{i=1}^{n} c_i$.\par
+\textit{Find} a coverage trajectory $P$ as a finite set of continuous way-points $p$, which can be written as $P = \{p_1, .., p_n\}$. Where each way-point corresponds to the centroid of a corresponding cell, thus $dim(P) = dim(C)$;
+Considering that valid solutions of P should not visit a way-point twice, the variable of interest to minimize is typically the path length and the number of changes in directions.
+  % section problem_definition (end)
 \section{Theory Background} % (fold)
 \label{sec:theory_background}
-\textit{Coverage path planning} (CPP) is the problem of finding a trajectory for a mobile robot such that a target area is completely swept by the sensor footprint. In the following section it is first presented the conventional CPP algorithms in use for mobile robots. Later, the focus moves more specifically over aerial application showing some previous work regarding this topic.
+\textit{Coverage Path Planning} (CPP) is the problem of finding a trajectory for a mobile robot such that a target area is completely swept by the sensor footprint. In the following section it is first presented the conventional CPP algorithms in use for mobile robots. Later, the focus moves more specifically over aerial application showing some previous work regarding this topic.
 
 \subsection{Coverage Path Planning for Mobile Robots} % (fold)
 \label{sub:coverage_path_planning_for_mobile_robots}
@@ -69,7 +76,7 @@ path of steepest ascent. In other words the robot moves away from the goal keepi
 \caption{Wavefront method \cite{Zelinsky93planningpaths}}
 \label{fig:wavefront}
 \end{figure}
-The pseudocode to obtain such behavior is listed in \autoref{alg:Wavefront-distance}.\todo{valutare se mettere l'algoritmo qui o dopo}
+The pseudocode to obtain such behavior is listed in \autoref{alg:Wavefront-distance}. \todo{valutare se mettere l'algoritmo qui o dopo}
 A nice feature of this approach is that it is possible to set both starting and goal position. This comes in handy in cleaning or lawn mowing application. However, in some case this method can not avoid revisiting cells. Another shortcoming it is worth to highlight is the high number of turn in the coverage path. This is because the path follows the "spiral" of the distance transform wave front that radiates from the goal. A solution to this problem as will be presented in the next sections, could be to take into account other factors than only the distance from the goal.\par
 \begin{algorithm}
 	\SetKwData{SCell}{startCell}\SetKwData{CCell}{currentCell}\SetKwData{Cell}{cell}\SetKwData{Stop}{stop}\SetKwData{NeighborCell}{neighborCell}
@@ -107,29 +114,186 @@ The \textit{Minimum-Spanning-Tree} (MST) method only considers the cells that ar
 \end{figure}
 % subsubsection grid_based_methods (end)
 
+\subsubsection{Close-loop Control methods (Online)} % (fold)
+\label{ssub:close_loop_control_method}
+Online approaches compute the coverage path \textit{in situ} based on sensor information, therefore unlikely offline counterpart does not require an \textit{a priori} knowledge of the environment. These methods usually formulate the coverage task as an optimization problem in which the goal is to minimize (e.g., sensor overlap) or maximize (e.g., sensing of uncovered area) a metric. Howard in \cite{PotFieldCPP} developed a method in which a continuous potential field is used to accomplish a coverage task using a team of mobile sensors. Sensors are repelled by obstacles and other team members and are consequently spread out in the area. This is a static and somehow primitive approach for CPP as it do not guarantee neither efficiency nor complete coverage, its aim is in fact to rapidly find hazards in a scenario involving hazardous materials leak in a damaged structure.\\
+Other approach consist in a control law composed of two components: i) a local component that is dependent on the coverage status of a local neighborhood, designed to direct the robot towards regions with high local coverage benefit and ii) a global component that depends on the global coverage status and directs the robot towards a point from where the robot can cover uncovered regions \cite{6385558}.\\ DA FAREREEEEEEJGFJDIJDIJFIJDIJIJD \
+
+A recent work by Song in \cite{8286947} present the $\varepsilon$-algorithm (that stands for $\varepsilon$-STAR or “$\varepsilon$-coverage via structural transitions to abstract resolutions”), where $\varepsilon$ refers to the cell resolution. As shown in Fig. 1, the algorithm utilizes an Exploratory Turing Machine (ETM), that consists of a twodimensional multilevel tape formed by Multiscale Adaptive Potential Surfaces (MAPS). The ETM stores and updates the information corresponding to unexplored, explored, and obstacle-occupied regions, as time-varying potentials on MAPS. In essence, it takes advantage of both the potential field-based and sensor-based planning methods by incrementally building the MAPS using real-time sensor measurements. While, by default, the ETM uses the lowest level of MAPS for generating the coverage path online, it switches to higher levels as needed to escape from a local extremum. The ETM acts as a supervisor to the autonomous vehicle and guides it with adaptive navigation commands.
+% subsubsection close_loop_control_method (end)
 
 % subsection coverage_path_planning_for_mobile_robots (end)
 \subsection{Aerial Coverage using UAVs} % (fold)
 \label{sub:aerial_coverage_using_uavs}
+In aerial coverage the CPP methods presented in \autoref{sub:coverage_path_planning_for_mobile_robots} have been largely adopted. In this application the environment is specified as a grid or a polygon using GPS coordinates for polygon nodes or for the center of the cells. Obstacles are generally neglected as the flight altitude is usually high enough to avoid unwanted collision. Anyway in aerial coverage there are often uninterested regions which is out of interest in the coverage task but flight over them is allowed. For example for the specific coverage required in BambiSaver a lake is of no interest as no animals hide there. An important factor in aerial coverage using UAV is the limited flight time of the vehicle. For this reason generating an efficient path is of great importance. Along with shortening the path limiting as much as possible sensor overlap, it is relevant to minimize the number of turns in the flight trajectory. Reducing the number of turnings will produce trajectory that consist of long straight stripes. This kind of trajectory let the robot to maintain as long as possible the cruise speed, reducing acceleration and consequently power consumption.
 
-
-% The general CPP methods introduced in Chapter 2.2.1 have been applied directly to aerial coverage often in an offline setting. In these works, the target area is specified as a polygon or grid with GPS coordinates of the polygon nodes or grid center. It is usually assumed that the UAV is flying at an altitude which is safe and hence there is no risk of colliding with an obstacle. However sometimes some parts of the environment are treated as no-flying zones which should be avoided by the UAV. Therefore in CPP for UAVs, these subregions are dealt with as obstacles. Another type of region that might be present in aerial coverage is uninteresting regions. Flying in these regions is allowed but does not contribute to the coverage goal i.e. covering them is of no value. For example in a outdoor crop mapping task with a quadrotor, covering the lake is unnecessary but flying over it (for example to reach the other side of the lake) is allowed.\\
+% The general CPP methods introduced in Chapter 2.2.1 have been applied directly to aerial coverage often in an offline setting. In these works, the target area is specified as a polygon or grid with GPS coordinates of the polygon nodes or grid center. It is usually assumed that the UAV is flying at an altitude which is safe and hence there is no risk of c{}olliding with an obstacle. However sometimes some parts of the environment are treated as no-flying zones which should be avoided by the UAV. Therefore in CPP for UAVs, these subregions are dealt with as obstacles. Another type of region that might be present in aerial coverage is uninteresting regions. Flying in these regions is allowed but does not contribute to the coverage goal i.e. covering them is of no value. For example in a outdoor crop mapping task with a quadrotor, covering the lake is unnecessary but flying over it (for example to reach the other side of the lake) is allowed.\\
 % As mentioned before, due to the very short flight time of UAVs, generating efficient coverage paths is useful. To reach efficiency, existing methods try to avoid unnecessary coverage, i.e. they try to minimize the overlap in the sensor footprint along the produced trajectory. This goal will consequently reduce the path length. Another element considered by some existing methods is to minimize the number of turns in the flight trajectory. Reducing the number of turnings will consequently produce trajectories that consist of long straight stripes, as is the case in Lawnmower pattern. Therefore, when a robot follows the trajectory it can maintain a constant velocity in a large part of the coverage path and it only accelerates or de-accelerates when it is turning. The overall outcome is less power consumption. Such efficient coverage trajectories can be planned offline when the environment is known a priori. Some of these methods, aimed for aerial coverage, are presented in the following section which includes planning for both single and multi-robot systems. However, when no prior knowledge about the target area is available, the planning has to be done online based on the real-time sensory data.\\
 % In the following, we present the existing methods of coverage trajectories planning for unmanned aerial vehicles. We partition the approaches into two main groups: a) methods that precompute the trajectory based on a priori knowledge of the environment and b) methods that adaptively re-plan the trajectory based on on-line sensory data.
  % subsection aerial_coverage_using_uavs (end)
-
-\subsection{Flight Altitude} % (fold)
-\label{sub:flight_altitude}
-How to compute the required flight altitude (resolution + sensor footprint + required photo overlap). Some calculation will be listed.
-% subsection flight_altitude (end
-
 
 % section theory_background (end)
 
 \section{Proposal Solution} % (fold)
 \label{sec:proposal_solution}
+The proposal implementation is based on the \textit{Wavefront} algorithm presented in \autoref{ssub:grid_based_methods}.
 
-Abbiamo scelto il wavefront perche' oltre ad essere abbastanza efficente computazionalmente permette di tenere conto di diverse cost function (diverse priorita' come ad esempio variazioni di altitudine, minor number of turns, ecc...)]
+It has been chosen this algorithm among the other for the following reasons:
+\begin{itemize}
+	\item The environment is known \textit{a-priori} thus an offline solution is preferable.
+	\item The wavefront algorithm proved to be robust and quite efficient for aerial coverage application \cite{7496385}.
+	\item This approach provide the possibility to implement different cost function, thus it is possible to obtain different behaviors (i.e. Taking care of the ground elevation profile).
+\end{itemize}
+\subsection{Workplace Sampling} % (fold)
+\label{sub:workplace_sampling}
+The workplace is decomposed through approximate cellular decomposition. In this method as explained before, the target area is divided in a grid of squared cell and a point is placed in the center of each rectangle. It has been decided to use squared shaped cells even though most of the available thermal sensor have a rectangular FOV to simplify the problem. In fact under this assumption it is possible to neglect the camera orientation and, in addition, this will produce an overlap in the recorded images which improves coverage performance compensating for the presence of small inaccuracy in the tracking of the flight trajectory. Cells dimension is chosen according to the required image resolution and it is dictated by the thermal sensor resolution. Once the cell dimension has been defined the next step is to compute the flight altitude which guarantee that the cell is completely covered by the FOV (Field of View) of the sensor when the UAV reach the point in the center of the cell. This height is maintained during the whole mission to ensure a uniform sampling of the whole field. \par
+
+The thermal camera chosen to make the computation is the Flir Duo R a radiometric dual-sensor thermal camera specifically made for drone \cite{flir:DuoR}. The main specification of the camera are listed in \autoref{fig:FlirDuoR-specs}.\\
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/C3/FlirDuoR-specs.png}
+    \caption{Flir Duo R thermal camera specs \cite{flir:DuoR}}
+    \label{fig:FlirDuoR-specs}
+\end{figure}
+In the following analysis the camera is supposed to be mounted on a gimbal and facing downwards. In this way the gimbal compensate for UAV movements and keep the camera always parallel to the horizontal plane making the FOV projection easier to be computed.\\
+The required FOV dimension $\tau_d$ is calculated so that one pixel of the image correspond at least to the required resolution:
+\begin{gather*}
+\tau_d = I_r \cdot p_{min} \\
+I_r = I_t \cdot \gamma
+\end{gather*}
+Where:
+\begin{itemize}[noitemsep]
+  \item[] $I_t$: target dimension 
+  \item[] $\gamma$: safe factor ($\gamma < 1$)
+  \item[] $I_r$: required resolution
+  \item[] $p_{min}$: minimum sensor resolution (pixels)
+\end{itemize}
+Each cell must be smaller then the FOV, thus: $d \leq \tau_d$. \\
+
+The flight height $\tau_h$ is then compute from the definition of FOV:
+\begin{gather*}
+\tau_d = 2\,\tau_h \cdot\tan\left(\frac{\alpha}{2} \right)\\
+\Rightarrow \quad \tau_h = \frac{\tau_d}{2\,\cdot\tan\left(\frac{\alpha}{2} \right)}
+\end{gather*}
+Where:
+\begin{itemize}[noitemsep]
+  \item[] $\tau_d$: FOV minimum dimension
+  \item[] $\alpha$: minimum degree of the camera lens
+\end{itemize}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/C3/FOV.png}
+    \caption{UAV altitude and the image requirements}
+    \label{fig:FOV}
+\end{figure}
+
+Now, supposing to model the target of the searching mission as a square with sides of $0.2\ cm$ (a little fawn is generally much bigger) and a safe factor $\gamma = 0.5$, then the above formulas produce the following results:
+\begin{itemize}[noitemsep]
+  \item[] $\tau_d = 12\,m$
+  \item[] $\tau_h = 14.85\, m$
+\end{itemize}
+Therefore it has been decided to go for $10m \times 10m$ cells and fly at an altitude of $14\,m$ above the ground to have an adequate safe margin.
+% subsection workplace_sampling (end)
+\subsection{Wave-front Algorithm} % (fold)
+\label{sub:wave_front_algorithm}
+Being $G$ the grid graph, where each element represent a cell through its centroid.
+Consider the navigation function: $\phi:\, G \rightarrow [1, \infty]$ which has the properties as a potential function. For the goal cell, the navigation cost $\phi(c_G)=1$ and the further the cell position to the goal cell the larger the navigation cost\footnote{In the actual implementation only distance transformation has been taken into account as cost function.}.
+Once the cost has been assigned to each cell the planner algorithm will find the path which guarantees that all the cell having an higher value then the goal cell are visited before the robot reaches the goal.\par
+
+
+In order to construct a navigation function, we must consider the type of \textit{cell connectivity} based on the maneuverability of robot. In grid-based path planning there are two types of connectivity: the Von Neumann neighborhood (\autoref{sfig:neuman-neighborhood}) and Moore neighborhood (\autoref{sfig:moore-neighborhood}). In a Von Neumann neighborhood, the  robot turning angle is limited to $\pm 90$. In Moore neighborhood the robot will be able to turn $\pm 45$, $\pm 90$, or $\pm 135$. A quad-rotors UAV, being an \textit{holonomic} robot, it can turn at any direction rotating to any yaw angle value by changing the velocity of each motors. Therefore, it is straightforward the choice of using Moore neighborhood.
+\begin{figure}[ht]
+\centering
+\begin{subfigure}{.3\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/C3/neumann-neighborhood.png}
+  \caption{}
+  \label{sfig:neuman-neighborhood}
+\end{subfigure}
+\hspace{2cm}
+\begin{subfigure}{.3\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/C3/moore-neighborhood.png}
+  \caption{}
+  \label{sfig:moore-neighborhood}
+\end{subfigure}
+\caption{\ref{sfig:neuman-neighborhood} Von Neumann Neighborhood \ref{sfig:moore-neighborhood} Moore Neighborhood}
+\label{fig:neighborhood}
+\end{figure}
+
+Once the cell connectivity has been defined the next step is to decompose the workplace into a grid. Therefore the target area must be completely within the grid. The cells dimension has been already computed as discussed before, thus the grid dimensions are simply obtained measuring the maximum field dimensions along the horizontal and vertical axis and dividing by the cell dimension. The result of both divisions is rounded up in order to guarantee that in any case the field is smaller than the grid. The cells of the rectangular matrix so obtained, have to be marked depending on whether they are part of the field or not. The strategy adopted is to represent both the field and the cell of the grid as polygons ??living??\todo{existing, living??} in the same coordinates reference system. To check if a particular cell belongs to the workplace the intersection between the two polygons is performed. If the intersection exists the cell under consideration is part of the field, otherwise it is not. The \textit{approximate cellular decomposition} of the target area is so achieved. The \autoref{alg:Bambi-grid-decomposition} explain formally how to construct the grid representation of the working field.
+
+\begin{algorithm}
+	\SetKwData{x}{x}\SetKwData{l}{cellDimension}\SetKwData{LB}{leftBorderE}\SetKwData{RB}{rightBorderE}\SetKwData{BB}{bottomBorderN}\SetKwData{TB}{topBorderN}\SetKwData{w}{width}\SetKwData{h}{height}\SetKwData{nE}{nE}\SetKwData{nN}{nN}\SetKwData{Matrix}{M}\SetKwData{FieldP}{fieldPoly}\SetKwData{CellP}{cellPoly}
+	\SetKwFunction{getPolygonFromMatrixCell}{getPolygonFromMatrixCell}\SetKwFunction{Ceil}{ceil}
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	
+	\Input{A polygon \FieldP representing the target area; The \l}
+	\Output{A matrix \Matrix which correspond to the cellular decomposition of the field (i.e. where each cell is marked as "Field" or "Empty" according to whether it is part of the field or not)}
+	\BlankLine
+	
+	\tcc{border member of the polygon are the East or North (UTM) coordinates  of the polygon's edges}
+	\w $\leftarrow$ $\FieldP.\RB - \FieldP.\LB$ \;
+	\h $\leftarrow$ $\FieldP.\TB - \FieldP.\BB$ \;
+
+	\tcc{Computes the matrix dimensions}
+	\nE $\leftarrow$ \Ceil{$\w / \l$} \;
+	\nN $\leftarrow$ \Ceil{$\h / \l$} \;
+	Define \Matrix as a $\nN\times\nE$-matrix\;
+	\ForAll{$\x \in \Matrix$}{
+			\FieldP $\leftarrow$ \getPolygonFromMatrixCell{\FieldP.\BB, \FieldP.\LB, \x, \l} \;
+			\If(\tcc*[h]{cell x intersect fieldP}){$\FieldP \cap \CellP > 0$}{
+				\Matrix(x) $\leftarrow$ Field\;
+			}
+			\Else(\tcc*[h]{cell x do not intersect fieldP}){
+				\Matrix(x) $\leftarrow$ Empty\;
+			}
+
+	}
+\caption{Approximate cellular decomposition of the field in a grid of squared cells}
+\label{alg:Bambi-grid-decomposition}
+\end{algorithm}
+
+
+\begin{algorithm}
+	\SetKwData{GCell}{goalCell}\SetKwData{x}{x}\SetKwData{W}{W}\SetKwData{Stop}{stop}\SetKwData{Matrix}{M}\SetKwData{i}{i}
+	\SetKwFunction{getUnexploredNeighbors}{getUnexploredNeighbors(\Matrix, \x)}
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	
+	\Input{A matrix \Matrix representing the grid:;the \GCell}
+	\Output{A matrix $\Matrix_o$ filled with Cost Function}
+	\BlankLine
+	
+  	$\W_0$ $\leftarrow$ \GCell \;
+	\i $\leftarrow$ 0 \;
+	\Repeat{\Stop is true}{
+		$\W_{i+1}$ $\leftarrow$ empty \;
+		\ForAll{$\x \in \W_{\i}$}{
+			$\Matrix_o$(x) $\leftarrow$ \i \;	
+			$\W_{i+1}$ $\leftarrow$ \getUnexploredNeighbors \;
+		}
+		\i $\leftarrow$ \i+1 \;
+		\If(\tcc*[h]{No more cells to expand}){$\W_{i+1}$ is empty}{
+			\Stop $\leftarrow$ true\;
+		}
+	}
+\caption{Filling matrix using Wavefront propagation starting from the \textit{goal} cell}
+\label{alg:Bambi-Wavefront}
+\end{algorithm}
+
+
+
+
+
+
+
+% !!!!!!Da mettere nella scelta della starting position !!!!!!!
+% The starting position is chosen as the cell having the higher 
+
+
+
+
+
 % section proposal_solution (end)
 
 
