@@ -27,7 +27,7 @@
 \usepackage{mathrsfs}
 \usepackage{units}
 \usepackage{threeparttable}
-\usepackage{enumitem}
+\usepackage[inline]{enumitem}
 \usepackage{todonotes}
 \usepackage{gensymb}
 \usepackage{lipsum}
@@ -51,7 +51,7 @@
 
 
 
-\title{Agricultural Field Detection and Path Planning for an Unmanned Aerial Vehicle}
+\title{Agricultural Field Detection and Coverage Path Planning for an Unmanned Aerial Vehicle}
 \author{Michael Rimondi}
 \date{\today}
 
@@ -66,6 +66,7 @@
        \@starttoc{#2}%
       }%
    }
+
 \makeatother
 \renewlistof\listoffigures{lof}{\listfigurename}
 \renewlistof\listoftables{lot}{\listtablename}
@@ -85,7 +86,8 @@
 
 \begin{document}
 
-
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
 \hypersetup{pageanchor=false}
 \maketitle
 
@@ -168,14 +170,11 @@
 \input{c3-CPP}
 % chapter coverage_path_planning (end)
 
-\chapter{Simulation results} % (fold)
-\label{sec:simulation_results}
-\input{c4-SimulationResults}
 
 % chapter simulation_results (end)
-\chapter{Conclusion} % (fold)
+\chapter{Conclusion and Future Work} % (fold)
 \label{cha:conclusion}
-
+\input{C4-Conclusion}
 % chapter conclusion (end)
 
 

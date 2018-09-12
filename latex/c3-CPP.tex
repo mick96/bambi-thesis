@@ -134,16 +134,16 @@ In aerial coverage the CPP methods presented in \autoref{sub:coverage_path_plann
 
 % section theory_background (end)
 
-\section{Proposal Solution} % (fold)
+\section{Bambi Project CPP} % (fold)
 \label{sec:proposal_solution}
 The proposal implementation is based on the \textit{Wavefront} algorithm presented in \autoref{ssub:grid_based_methods}.
-
-It has been chosen this algorithm among the other for the following reasons:
+This algorithm has been chosen among the other for the following reasons:
 \begin{itemize}
 	\item The environment is known \textit{a-priori} thus an offline solution is preferable.
 	\item The wavefront algorithm proved to be robust and quite efficient for aerial coverage application \cite{7496385}.
 	\item This approach provide the possibility to implement different cost function, thus it is possible to obtain different behaviors (i.e. Taking care of the ground elevation profile).
 \end{itemize}
+
 \subsection{Workplace Sampling} % (fold)
 \label{sub:workplace_sampling}
 The workplace is decomposed through approximate cellular decomposition. In this method as explained before, the target area is divided in a grid of squared cell and a point is placed in the center of each rectangle. It has been decided to use squared shaped cells even though most of the available thermal sensor have a rectangular FOV to simplify the problem. In fact under this assumption it is possible to neglect the camera orientation and, in addition, this will produce an overlap in the recorded images which improves coverage performance compensating for the presence of small inaccuracy in the tracking of the flight trajectory. Cells dimension is chosen according to the required image resolution and it is dictated by the thermal sensor resolution. Once the cell dimension has been defined the next step is to compute the flight altitude which guarantee that the cell is completely covered by the FOV (Field of View) of the sensor when the UAV reach the point in the center of the cell. This height is maintained during the whole mission to ensure a uniform sampling of the whole field. \par
@@ -194,35 +194,39 @@ Now, supposing to model the target of the searching mission as a square with sid
 \end{itemize}
 Therefore it has been decided to go for $10m \times 10m$ cells and fly at an altitude of $14\,m$ above the ground to have an adequate safe margin.
 % subsection workplace_sampling (end)
-\subsection{Wave-front Algorithm} % (fold)
-\label{sub:wave_front_algorithm}
-Being $G$ the grid graph, where each element represent a cell through its centroid.
-Consider the navigation function: $\phi:\, G \rightarrow [1, \infty]$ which has the properties as a potential function. For the goal cell, the navigation cost $\phi(c_G)=1$ and the further the cell position to the goal cell the larger the navigation cost\footnote{In the actual implementation only distance transformation has been taken into account as cost function.}.
-Once the cost has been assigned to each cell the planner algorithm will find the path which guarantees that all the cell having an higher value then the goal cell are visited before the robot reaches the goal.\par
-
-
-In order to construct a navigation function, we must consider the type of \textit{cell connectivity} based on the maneuverability of robot. In grid-based path planning there are two types of connectivity: the Von Neumann neighborhood (\autoref{sfig:neuman-neighborhood}) and Moore neighborhood (\autoref{sfig:moore-neighborhood}). In a Von Neumann neighborhood, the  robot turning angle is limited to $\pm 90$. In Moore neighborhood the robot will be able to turn $\pm 45$, $\pm 90$, or $\pm 135$. A quad-rotors UAV, being an \textit{holonomic} robot, it can turn at any direction rotating to any yaw angle value by changing the velocity of each motors. Therefore, it is straightforward the choice of using Moore neighborhood.
+\subsection{ROS Node Architecture} % (fold)
+\label{sub:ros_node_architecture}
+The coverage path planning algorithm is implemented in the ROS node named \textit{/coverage\_path\_planner}. The graph in \autoref{fig:CPP-rqt-graph} display the nodes and topics related to the CPP procedure.
 \begin{figure}[ht]
-\centering
-\begin{subfigure}{.3\textwidth}
-  \centering
-  \includegraphics[width=.9\linewidth]{figures/C3/neumann-neighborhood.png}
-  \caption{}
-  \label{sfig:neuman-neighborhood}
-\end{subfigure}
-\hspace{2cm}
-\begin{subfigure}{.3\textwidth}
-  \centering
-  \includegraphics[width=.9\linewidth]{figures/C3/moore-neighborhood.png}
-  \caption{}
-  \label{sfig:moore-neighborhood}
-\end{subfigure}
-\caption{\ref{sfig:neuman-neighborhood} Von Neumann Neighborhood \ref{sfig:moore-neighborhood} Moore Neighborhood}
-\label{fig:neighborhood}
+    \centering
+    \includegraphics[width=1\textwidth]{figures/C3/CPP-rqt-graph.png}
+    \caption{ROS-graph of CPP related nodes and topics}
+    \label{fig:CPP-rqt-graph}
 \end{figure}
+The scope of the other nodes that appear in the graph are:
+\begin{description}
+	\item[\textit{/mission\_controller}] It handles all the mission operations as discussed in \autoref{cha:georeferencing_the_mission_s_environment}
+	\item[\textit{/terrain\_data\_provider}] It provides a service (this is why in the graph it is isolated) which allow the CPP node to request terrain data. It access to Google elevation databases using the Google elevation API. The inquiry is done in the form of an URL request through the python library \textit{urllib} \cite{urllib}. 
+	\item[\textit{/kml\_generator}] It generates a KML file from the CPP generated path. This task is not needed during the mission but it is of great help in debugging and for better display the CPP output.
+\end{description}
+The \textit{Coverage Path Planner} node task can be further divided in five sub-operations:
+\begin{enumerate*}[label={(\arabic*)}]
+	\item Approximate cellular Decomposition;
+	\item Wave-front Propagation Algorithm;
+	\item Choosing Starting Position
+	\item Coverage Path Generator;
+	\item Spline Interpolation;
+\end{enumerate*}
+\subsubsection{Relevant Messages Definition} % (fold)
+\label{ssub:relevant_messages_definition}
 
-Once the cell connectivity has been defined the next step is to decompose the workplace into a grid. Therefore the target area must be completely within the grid. The cells dimension has been already computed as discussed before, thus the grid dimensions are simply obtained measuring the maximum field dimensions along the horizontal and vertical axis and dividing by the cell dimension. The result of both divisions is rounded up in order to guarantee that in any case the field is smaller than the grid. The cells of the rectangular matrix so obtained, have to be marked depending on whether they are part of the field or not. The strategy adopted is to represent both the field and the cell of the grid as polygons ??living??\todo{existing, living??} in the same coordinates reference system. To check if a particular cell belongs to the workplace the intersection between the two polygons is performed. If the intersection exists the cell under consideration is part of the field, otherwise it is not. The \textit{approximate cellular decomposition} of the target area is so achieved. The \autoref{alg:Bambi-grid-decomposition} explain formally how to construct the grid representation of the working field.
-
+% subsubsection relevant_messages_definition (end)
+In the following sections, the specification of each sub-task is explained as well as its implementation.
+% subsection ros_node_architecture (end)
+\subsection{Approximate Cellular Decomposition} % (fold)
+\label{sub:approximate_cellular_decomposition}
+In this section it is analyze how to decompose the workplace so that it can be represented as a grid of squared cells.\\
+The cells dimension has been already computed as discussed before, thus the grid dimensions are simply obtained measuring the maximum field dimensions along the horizontal and vertical axis and dividing by the cell dimension. The result of both divisions is rounded up in order to guarantee that in any case the field is smaller than the grid. The cells of the rectangular matrix so obtained, have to be marked depending on whether they are part of the field or not. The strategy adopted is to represent both the field and the cell of the grid as polygons ??living??\todo{existing, living??} in the same coordinates reference system. To check if a particular cell belongs to the workplace the intersection between the two polygons is performed. If the intersection exists the cell under consideration is part of the field, otherwise it is not. The \textit{approximate cellular decomposition} of the target area is so achieved. The \autoref{alg:Bambi-grid-decomposition} explain formally how to construct the grid representing the working field.
 \begin{algorithm}
 	\SetKwData{x}{x}\SetKwData{l}{cellDimension}\SetKwData{LB}{leftBorderE}\SetKwData{RB}{rightBorderE}\SetKwData{BB}{bottomBorderN}\SetKwData{TB}{topBorderN}\SetKwData{w}{width}\SetKwData{h}{height}\SetKwData{nE}{nE}\SetKwData{nN}{nN}\SetKwData{Matrix}{M}\SetKwData{FieldP}{fieldPoly}\SetKwData{CellP}{cellPoly}
 	\SetKwFunction{getPolygonFromMatrixCell}{getPolygonFromMatrixCell}\SetKwFunction{Ceil}{ceil}
@@ -232,7 +236,7 @@ Once the cell connectivity has been defined the next step is to decompose the wo
 	\Output{A matrix \Matrix which correspond to the cellular decomposition of the field (i.e. where each cell is marked as "Field" or "Empty" according to whether it is part of the field or not)}
 	\BlankLine
 	
-	\tcc{border member of the polygon are the East or North (UTM) coordinates  of the polygon's edges}
+	\tcc{border members of the polygon object are the East or North (UTM) coordinates  of the polygon's extremities}
 	\w $\leftarrow$ $\FieldP.\RB - \FieldP.\LB$ \;
 	\h $\leftarrow$ $\FieldP.\TB - \FieldP.\BB$ \;
 
@@ -253,8 +257,39 @@ Once the cell connectivity has been defined the next step is to decompose the wo
 \caption{Approximate cellular decomposition of the field in a grid of squared cells}
 \label{alg:Bambi-grid-decomposition}
 \end{algorithm}
+\subsubsection{Implementation} % (fold)
+\label{ssub:implementation}
+La questione della conversione delle coordinate
+% subsubsection implementation (end)
+% subsection approximate_cellular_decomposition (end)
+\subsection{Wave-front Propagation Algorithm} % (fold)
+\label{sub:wave_front_propagation_algorithm}
+Being $G$ the grid graph, where each element represent a cell through its centroid.
+Consider the navigation function: $\phi:\, G \rightarrow [1, \infty]$ which has the properties as a potential function. For the goal cell, the navigation cost $\phi(c_G)=1$ and the further the cell position to the goal cell the larger the navigation cost\footnote{In the actual implementation only distance transformation has been taken into account as cost function.}.
+Once the cost has been assigned to each cell the planner algorithm will find the path which guarantees that all cells having an higher value then the goal cell are visited before the robot reaches the goal.\par
 
+In order to construct a navigation function, we must consider the type of \textit{cell connectivity} based on the maneuverability of robot. In grid-based path planning there are two types of connectivity: the Von Neumann neighborhood (\autoref{sfig:neuman-neighborhood}) and Moore neighborhood (\autoref{sfig:moore-neighborhood}). In a Von Neumann neighborhood, the  robot turning angle is limited to $\pm 90$. In Moore neighborhood the robot will be able to turn $\pm 45$, $\pm 90$, or $\pm 135$. A quad-rotors UAV, being an \textit{holonomic} robot, it can turn at any direction rotating to any yaw angle value by changing the velocity of each motors. Therefore, it is straightforward the choice of using Moore neighborhood.
+\begin{figure}[ht]
+\centering
+\begin{subfigure}{.3\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/C3/neumann-neighborhood.png}
+  \caption{}
+  \label{sfig:neuman-neighborhood}
+\end{subfigure}
+\hspace{2cm}
+\begin{subfigure}{.3\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/C3/moore-neighborhood.png}
+  \caption{}
+  \label{sfig:moore-neighborhood}
+\end{subfigure}
+\caption{\ref{sfig:neuman-neighborhood} Von Neumann Neighborhood \ref{sfig:moore-neighborhood} Moore Neighborhood}
+\label{fig:neighborhood}
+\end{figure} 
 
+Now using the distance transformation (as cost function) the matrix is filled starting from the goal cell. This is carried out through wave-front propagation algorithm listed in \autoref{alg:Bambi-Wavefront}.
+The initial wavefront is $ W_0$, which represents the states where the current cell is the \textit{goal cell}. The algorithm can immediately assign an  optimal cost-to-go value of $ 1$ to every state that can be reached in one stage from any state in $ W_0$. The states that receive cost $ 1$ can be organized into the  wavefront $ W_1$. The unexplored neighbors of $ W_1$ are assigned cost $2$. This  process repeats inductively from $i$ to $ i+1$ until all reachable states (cells) have been reached. In the end, all the cells are filled in $O(n)$ time, in which $ n$ is the number of reachable grid states.
 \begin{algorithm}
 	\SetKwData{GCell}{goalCell}\SetKwData{x}{x}\SetKwData{W}{W}\SetKwData{Stop}{stop}\SetKwData{Matrix}{M}\SetKwData{i}{i}
 	\SetKwFunction{getUnexploredNeighbors}{getUnexploredNeighbors(\Matrix, \x)}
@@ -280,10 +315,83 @@ Once the cell connectivity has been defined the next step is to decompose the wo
 \caption{Filling matrix using Wavefront propagation starting from the \textit{goal} cell}
 \label{alg:Bambi-Wavefront}
 \end{algorithm}
+\subsubsection{Implementation} % (fold)
+\label{ssub:implementation}
+
+% subsubsection implementation (end)
+% subsection wave_front_propagation_algorithm (end)
+
+\subsection{Choosing Starting Position} % (fold)
+\label{sub:choosing_starting_position}
+The
+
+% subsection choosing_starting_position (end)
+\subsection{Coverage Path Generator} % (fold)
+\label{sub:coverage_path_generator}
+Once the elements matrix has been filled according to the cost function, the last step is to generate the path which assure that each cell is visited. This is done through a gradient ascending searching algorithm from the start cell. All the unvisited neighbors of the current cell are evaluated and for each is given a \textit{priority}. The neighbor having the higher priority is appointed and selected as the current cell for the next step of the iteration. The process continues until there are no more unvisited neighbors.\par
+\textit{Priority} function takes into account different features of the neighbors cells which are in order of weight \todo{weight / importance??}:
+\begin{enumerate}
+	\item The cost function value associated to that cell
+	\item How many adjacent cells have the same value, prediligendo\todo{trovare termine + capire meglio questione del local minimum} the neighbor which have the lower number of same value adjacent cells. This is to avoid as much as possible to reach a local minimum which cause the algorithm to stack.
+	\item The Von Neumann neighbors are preferred, i.e the diagonal neighbors have less priority because they are a little farther ($\sqrt{2}\,l$ instead of just $l$ as for Von Neumann neighbors)
+\end{enumerate}
+The pseudocode which plan the coverage path is listed in \autoref{alg:Bambi-pathPlanner}.
+\begin{algorithm}
+	\SetKwData{SCell}{startCell}\SetKwData{CCell}{currentCell}\SetKwData{x}{x}\SetKwData{W}{W}\SetKwData{Stop}{stop}\SetKwData{Matrix}{M}\SetKwData{P}{P}\SetKwData{reachedEnd}{reachedEnd}\SetKwData{bestPriority}{bestPriority}\SetKwData{N}{N}\SetKwData{priority}{priority}\SetKwData{bestChoice}{bestChoice}
+	\SetKwFunction{getUncoveredNeighbors}{getUncoveredNeighbors}\SetKwFunction{isDiagonalCell}{isDiagonalCell}\SetKwFunction{nSameValuedNeighbors}{nSameValuedNeighbors}\SetKwFunction{getCentroidCoordinates}{getCentroidCoordinates}\SetKwFunction{pushBack}{push\_back}
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	
+	\Input{the grid matrix \Matrix filled with Distance Transformation values; the \SCell}
+	\Output{A vector \P of waypoints representing the coverage path}
+	\BlankLine
+	\
+  	\CCell $\leftarrow$ \SCell \;
+	\reachedEnd $\leftarrow$ false \;
+	\While{not \reachedEnd}{
+		\reachedEnd $\leftarrow$ true \;
+		\bestPriority $\leftarrow$ -1 \;
+		\N $\leftarrow$ \getUncoveredNeighbors{\Matrix, \CCell} \;
+		\ForAll{$\x \in \N$}{
+			\reachedEnd $\leftarrow$ false \;
+			\priority $\leftarrow$ $\Matrix{\CCell}*100+ (8-\nSameValuedNeighbors{\Matrix, \x}*10 + 1$\;
+			\If(\tcc*[h]{It is a diagonal cell}){\isDiagonalCell{\CCell, \x}}{
+				\priority $\leftarrow$ $\priority - 1$ \;
+			}
+			\If(\tcc*[h]{find highest priority cells}){$\priority > \bestPriority$}{
+				\bestPriority $\leftarrow$ \priority \;
+				\bestChoice $\leftarrow$ \x \;
+			}
+		}
+		\If{not \reachedEnd}{
+			\Matrix{\CCell} $\leftarrow$ Covered\;
+			\P.\pushBack{\getCentroidCoordinates{\CCell}} \;
+			\CCell $\leftarrow$ \bestChoice \;
+
+		}
+	}
+\caption{Generating Coverage Path}
+\label{alg:Bambi-pathPlanner}
+\end{algorithm}
+
+\subsubsection{Implementation} % (fold)
+\label{ssub:implementation}
+
+% subsubsection implementation (end)
+% subsection coverage_path_generator (end)
+\subsection{Spline Interpolation} % (fold)
+\label{sub:spline_interpolation}
+The resulting coverage path is a piecewise function in the local reference system made up of segment connecting the center of the cells in the order provided by the algorithm shown in \autoref{sub:coverage_path_generator}. Therefore it is not 
 
 
 
 
+
+
+\subsubsection{Implementation} % (fold)
+\label{ssub:implementation}
+
+% subsubsection implementation (end)
+% subsection spline_interpolation (end)
 
 
 
@@ -292,13 +400,10 @@ Once the cell connectivity has been defined the next step is to decompose the wo
 
 
 
+\section{Simulation Results} % (fold)
+\label{sec:simulation_results}
+\textit{Qui mostrero' l'output dell'algoritmo rappresentato come tracciato su google earth. verranno messi a confronto diverse scelte di starting e goal point e discutero' delle performance ottenute con relativi problemi da risolvere}
 
-
-% section proposal_solution (end)
-
-
-\section{Implementation in ROS} % (fold)
-\label{sec:implementation_in_ros}
-
-
+\textit{\textbf{Mostrare importanza della scelta della starting position + bezier vs spline interpolation}}
+% section simulation_results (end)
 % section cpp_algorithms (end)

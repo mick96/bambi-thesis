@@ -110,26 +110,30 @@ Before entering in the implementation details an example of how the contour appe
 As it was accennato in \ref{sub:ortho_rectification} although the source of the orthophoto used in the software implementation is Google Earth, in defining the mission it has been taken into account the possibility to ??shut?? a photo of the whole field and georeference it (that is the goal of \textit{/optical\_cam} node). This would provide a ??more?? up-to-dated and eventually more accurate image, but at the same time the orthophoto generation is computationally heavy especially for a mini PC. This in addition to the limited flight time of the quadcopter suggest to use Google imagery database.
 In the following section it is explained how this part of the mission has been implemented in ROS. The most relevant part concerns the representation of the field contour as ROS message and the way to import it given the respective KML file.
 
-\subsection{ROS Nodes} % (fold)
+\subsection{ROS Nodes Architecture} % (fold)
 \label{sub:ros_nodes}
-\autoref{fig:field-detection-rqt} shows how the three ROS nodes (\textit{/mission\_controller},\textit{/optical\_cam} and \textit{/mission\_controller}, \textit{/boundary\_generator} and ), displayed as ovals, communicate together through the four topics represented inside rectangles. The node named \textit{/mavros} (for more details see appendix \ref{appendix:mavros}) on the left side of the diagram, manages everything regarding the communication with the aircraft. It basically provide a ROS interface to read the vehicle status variables and to change the flight controller behaviors.
+\autoref{fig:field-detection-rqt} shows how the three ROS nodes (\textit{/mission\_controller},\textit{/optical\_cam} and \textit{/mission\_controller}, \textit{/boundary\_generator} and ), displayed as ovals, communicate together through the four topics represented inside rectangles. The node named \textit{/mavros} (for more details see appendix \ref{appendix:mavros}) on the left side of the diagram, manages everything regarding the communication with the aircraft. It basically provide a ROS interface to read the vehicle status variables and to change the flight controller behaviors.\par
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1.3\textwidth]{figures/C2/fieldDetection-rqt_graph.pdf}
     \caption{Nodes and Topics concurring in generating the field contour}
     \label{fig:field-detection-rqt}
 \end{figure}
-
-
 Nodes specs:
 \begin{itemize}
-	\item \textit{/mission\_controller}: it is the node which contains the core of the mission. Through the implementation of a finite state machine it handle every mission steps and the transition among them. For what concern the scope of this chapter the main task of this node is to trigger the other two node, which really carry out the desired tasks
+	\item \textit{/mission\_controller}: it is the node which contains the core of the mission. Through the implementation of a finite state machine it handle every mission steps and the transition among them. For what concern the scope of this chapter the main task of this node is to trigger the other two node, which really carry out the desired tasks.
 	\item \textit{/optical\_cam}: upon the receiving (??reception??) of the \textit{trigger\_shutter} message from the mission controller node it triggers the camera shutter and saves the exact GPS position required to geo-tag the photo of the field.
 	At this point the node, in case the it has been chosen to georeference the image locally, will generate the orthophoto. The orthophoto algorithm has not been implemented yet as explained at the beginning of this section.
 	The node finish its job once it publishes the message containing the position of the orthophoto back to the \textit{/mission\_controller} node over the \textit{orthophoto\_ready} topic. 
 	\item \textit{/boundary\_generator}: This node when triggered is suppose to elaborate the field boundary and sand it to the mission controller node. The communication happens through the two topics \textit{trigger\_boundary} and \textit{boundary} as shown in the nodes graph.
 \end{itemize}
+\subsubsection{Relevant message definitions} % (fold)
+\label{ssub:relevant_message_definitions}
+\textit{QUI INSERIRE LISTING DELLA DEFINIZIONE DEI MESSAGGI USATI DAI DUE NODI}
+
 Now that a briefly introduction of each node has been done, a deeper analysis of the \textit{/optical\_cam} node and \textit{/boundary\_generator} node is carried out.
+% subsubsection relevant_message_definitions (end)
+
 
 \subsubsection{optical\_cam} % (fold)
 \label{ssub:optical_cam}
