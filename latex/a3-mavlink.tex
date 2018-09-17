@@ -9,13 +9,13 @@ The MAVLink toolchain uses the XML message definitions to generate MAVLink libra
 \paragraph{Key Features} % (fold)
 \label{par:key_features}
 \begin{itemize}
-	\item Very efficient. MAVLink 1 has just 8 bytes overhead per packet, including start sign and packet drop detection. MAVLink 2 has just 14 bytes of overhead (but is a much more secure and extensible protocol). Because MAVLink doesn't require any additional framing it is very well suited for applications with very limited communication bandwidth. 
-	\item Very reliable. MAVLink has been used since 2009 to communicate between many different vehicles, ground stations (and other nodes) over varied and challenging communication channels (high latency/noise). It provides methods for detecting packet drops, corruption, and for packet authentication.
+	\item Very efficient. MAVLink 1 has just 8 bytes overhead per packet, including start sign and packet drop detection. MAVLink 2 has just 14 bytes of overhead (but is a much more secure and extensible protocol). Because \acrshort{mavlink} doesn't require any additional framing it is very well suited for applications with very limited communication bandwidth. 
+	\item Very reliable. \acrshort{mavlink} has been used since 2009 to communicate between many different vehicles, ground stations (and other nodes) over varied and challenging communication channels (high latency/noise). It provides methods for detecting packet drops, corruption, and for packet authentication.
 	\item Supports many programming languages, running on numerous microcontrollers/operating systems (including ARM7, ATMega, dsPic, STM32 and Windows, Linux, MacOS, Android and iOS).
 	\item Allows up to 255 concurrent systems on the network (vehicles, ground stations, etc.)
-	\item Enables both offboard and onboard communications (e.g. between a GCS and drone, and between drone autopilot and MAVLink enabled drone camera).
+	\item Enables both offboard and onboard communications (e.g. between a GCS and drone, and between drone autopilot and \acrshort{mavlink} enabled drone camera).
 \end{itemize}
-In  a second version of the MAVLink protocol was release mainly to allow more then 256 message IDs as it was in the first version. In addition MAVLink 2 is backward-compatible and implement package signing (authentication) which greatly improves security. Basic frame is shown in \autoref{fig:mavlink-packet} and each fields is described in \autoref{tbl:mavlink-frame}. There are several MAVLink messages. Understanding them is vital for sending proper commands to the mav.
+In  a second version of the \acrshort{mavlink} protocol was release mainly to allow more then 256 message IDs as it was in the first version. In addition MAVLink 2 is backward-compatible and implement package signing (authentication) which greatly improves security. Basic frame is shown in \autoref{fig:mavlink-packet} and each fields is described in \autoref{tbl:mavlink-frame}. There are several \acrshort{mavlink} messages. Understanding them is vital for sending proper commands to the mav.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/A3/MAVLink-frame.png}
@@ -43,15 +43,22 @@ In  a second version of the MAVLink protocol was release mainly to allow more th
 \label{tbl:mavlink-frame}
 \end{table}
 
-\paragraph{MAVLink messages\\} % (fold)
-\label{par:mavlink_messages}
-It follows a short list of the most commonly used MAVLink messages:
-\begin{enumerate}
+\section{MAVLink Messages} % (fold)
+\label{sec:mavlink_messages}
+It follows a short list of the most commonly used \acrshort{mavlink} messages type:
+\begin{itemize}
 	\item MAVLINK\_MSG\_ID\_REQUEST\_DATA\_STREAM\\ This message is used to request the stream of data from the autopilot. Requested data can be sensors, RC channels, GPS position, status or the combination of them.
-	\item MAVLINK\_MSG\_ID\_COMMAND\_LONG\\ This message is used to give commands to the autopilot. Several commands are supported.
-	\item SET\_MODE\\ It sets the different mode of operations for the drone. Few supported modes for ArduCopter are	
-\end{enumerate}
-
+	\item MAVLINK\_MSG\_ID\_COMMAND\_LONG\\ This messa{}ge is used to give commands to the autopilot. Several commands are supported.
+	\item SET\_MODE\\ It sets the different mode of operations for the drone. Few supported mode in PX4 flight stack are: \begin{enumerate*}[label=]
+		\item Position;
+		\item Altitude;
+		\item Manual/Stabilize;
+		\item Acro;
+		\item Auto: Takeoff, Land, Hold, Return, Mission, Follow me, Offboard.
+\end{enumerate*}
+\end{itemize}
+In the \textit{Bambi Project} it was necessary to define a custom \acrshort{mavlink} named \\ MAV\_CMD\_BAMBI\_ START\_STOP\_MISSION whose \acrshort{xml} definition is given in \autoref{list:mavlink-bambi}. This message is sent by the ground station (\acrshort{qgc}) to the aircraft and cause the mission state to change.
+\lstinputlisting[label=list:mavlink-bambi, caption=MAVLink message definition of BAMBI\_ START\_STOP\_MISSION command, language=XML]{listings/A3/bambiMissionTriggerMAVLInk.xml}
 % paragraph mavlink_messages (end)
 
 % paragraph key_features (end)

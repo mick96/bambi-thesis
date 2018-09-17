@@ -38,6 +38,30 @@
 \usepackage{imakeidx}
 \usepackage{tabularx}
 \usepackage[ruled,vlined]{algorithm2e}
+\usepackage[toc,acronym]{glossaries}
+\usepackage{gensymb}
+% Set listing style
+\lstdefinestyle{mystyle}{
+captionpos=b,
+frame=tb,
+prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}}
+}
+\lstset{style=mystyle}
+
+\definecolor{maroon}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\lstdefinelanguage{XML}
+{
+  basicstyle=\ttfamily,
+  morestring=[s]{"}{"},
+  morecomment=[s]{?}{?},
+  morecomment=[s]{!--}{--},
+  commentstyle=\color{darkgreen},
+  moredelim=[s][\color{black}]{>}{<},
+  moredelim=[s][\color{red}]{\ }{=},
+  stringstyle=\color{blue},
+  identifierstyle=\color{maroon}
+}
 
 \makeindex
 \indexsetup{level=\section,noclearpage}
@@ -48,7 +72,6 @@
 \providecommand{\keywords}[1]{\textbf{\textit{Keywords: }} #1}
 \def\UrlBreaks{\do\/\do-}
 \input{matlab-code-config}
-
 
 
 \title{Agricultural Field Detection and Coverage Path Planning for an Unmanned Aerial Vehicle}
@@ -84,6 +107,20 @@
 \fancyfoot[C]{\thepage}
 \pagestyle{fancy}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%Acronyms list BEGIN%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeglossaries
+\newacronym{uav}{UAV}{Unmanned Aerial Vehicle}
+\newacronym{ros}{ROS}{Robot Operating System}
+\newacronym{cpp}{CPP}{Coverage Path Planning}
+\newacronym{wgs84}{WGS84}{World Geodetic System of 1984}
+\newacronym{utm}{UTM}{Universal Transverse of Mercator}
+\newacronym{sitl}{SITL}{Software-In-The-Loop}
+\newacronym{qgc}{QGC}{QGroundControl}
+\newacronym{mavlink}{MAVLink}{Micro Air Vehicle Link}
+\newacronym{xml}{XML}{eXtensible Markup Language}
+\newacronym{qml}{QML}{Qt Modeling Language}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%Acronyms list END%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
 \setcounter{secnumdepth}{3}
@@ -97,11 +134,11 @@
 \pagenumbering{roman}
 \setcounter{page}{1}
 \newpage
-%%%%%%%%%%%%%% REMOVE ME %%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%% REMOVE ME %%%%%%%%%%%%%%%%%
 
-\thispagestyle{empty}
-\setcounter{page}{2}
-\cleardoublepage
+% \thispagestyle{empty}
+% \setcounter{page}{2}
+% \cleardoublepage
 
 
 \pagenumbering{roman}
@@ -139,8 +176,10 @@
 \pagestyle{plain}
 \tableofcontents
 
-\cleardoublepage
 
+% Print Acronym list
+\printglossary[type=\acronymtype]
+\cleardoublepage
 
 % begin content and use roman numbers for chapter,
 % without including them in the section numbering (no I.1)

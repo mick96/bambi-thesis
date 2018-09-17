@@ -10,7 +10,7 @@ In this introduction it is first briefly described the motivation, objective and
 \subsection{Motivation} % (fold)
 \label{ssec:motivation}
  Deers gives birth to their offspring during April and May \cite{MowlingMortality}, often choosing meadows as they consider it a safe spot. This period is unfortunately the same in which meadows are cut. The results is that every year a great number of young deers fall victim of combine harvesters cutting hay. Germany counts about 100000 death every harvest season \cite{MowlingMortality}.
- The BambiSaver project was born aiming to provide an autonomous, fast and user friendly device able to search and locate, living creatures in agricultural areas. It is, as a matter of fact, difficult to locate small animals hidden in vast grasslands especially if they freeze when they feel under threat. For this specific reason the proposal design is based on a UAV (Unmanned Aerial Vehicle) \cite{ICAO} and more precisely a quad-copter equipped with a thermal camera.
+ The BambiSaver project was born aiming to provide an autonomous, fast and user friendly device able to search and locate, living creatures in agricultural areas. It is, as a matter of fact, difficult to locate small animals hidden in vast grasslands especially if they freeze when they feel under threat. For this specific reason the proposal design is based on an \acrfull{uav}\cite{ICAO} and more precisely a quad-copter equipped with a thermal camera.
  An aerial vehicle is, in fact, able to efficiently cover large surfaces way faster then any other ground alternatives and guarantees the best viewpoint for the specific kind of wildlife research. Moreover it has been chosen a copter rather than a fixed wing model for its holonomic properties which turns out to be very useful in upland regions as well as for small and irregular fields. It is basically why in search and rescue operations helicopters are often adopted instead of planes.
 
 \subsection{Importance for Wildlife and for Agricultural}
@@ -64,11 +64,11 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
  \label{sec:bambisaver_goals}
  The scope of the Bambi project is to design an integrated system capable to autonomously handle every steps of the mission so that it can be operated also by untrained personals. This must be guaranteed even in adverse environments, especially in uneven fields as it is in upland regions. \todo{????the idea was developed having the mountain of Trentino Altoadige in mind????}
  Along with this, it is of particular interest to keep modularity in every hardware and software components. This is to permit easier implementation of new features or improvements.
- All this guidelines \todo{sinonimo per dire idee alla bass} have been taken into account during the design and implementation stages (i.e. ROS as framework for the on-board computer).
+ All this guidelines \todo{sinonimo per dire idee alla bass} have been taken into account during the design and implementation stages (i.e. \acrshort{ros} as framework for the on-board computer).
 
  \subsection{Software Architecture concept} % (fold)
  \label{sub:software_design}
- The raspberry Pi 3 it is used as on-board computer, it runs ROS (see appendix \ref{appendix:ros}) and manages the transition between the different mission's phases. The software develops according to the usual ROS philosophy \cite{288}, thus it is composed of five nodes implementing every mission component as an independent module. \autoref{fig:rqtgraph} displays all the nodes and the related topics used to let them communicate.
+ The raspberry Pi 3 it is used as on-board computer, it runs \acrshort{ros} (see appendix \ref{appendix:ros}) and manages the transition between the different mission's phases. The software develops according to the usual \acrshort{ros} philosophy \cite{288}, thus it is composed of five nodes implementing every mission component as an independent module. \autoref{fig:rqtgraph} displays all the nodes and the related topics used to let them communicate.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1.4\textwidth, angle=270]{figures/C1/rqtgraph.eps}

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<mavlink>
+<version>3</version>
+<dialect>0</dialect>
+  <enum name="MAV_CMD">
+    <description>
+      Commands to be executed by the MAV. They can be executed on user request, or as part of a mission script.
+    </description>
+    <entry value="2720" name="MAV_CMD_BAMBI_START_STOP_MISSION">
+      <description>
+        Request to start/stop Bambi mission: it also contain the coordinate of the first mission point
+      </description>
+      <param index="1">Trigger Mission (0: stop, 1: start)</param>
+      <param index="2">AltitudeTO (in meters, relative to home)</param>
+      <param index="3">Latitude of orthophoto (WGS84)</param>
+      <param index="4">Longitude of orthophoto (WGS84)</param>
+      <param index="5">Altitude of orthophoto (in meters AMSL)</param>
+      <param index="6">Altitude of scanning (in meters, relative to ground)</param>
+      <param index="7">Sensor Footprint min Dimension (in meters)</param>
+    </entry>
+  </enum>
+</mavlink>

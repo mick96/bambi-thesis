@@ -1,9 +1,9 @@
 %!TEX root = bambi-thesis.tex
-This chapter begins with a theory digression about the topic of Coverage Path Planning. Then the algorithm chosen for the application in this thesis is explained in details and finally the ROS implementation of the algorithm is presented and discussed.
+This chapter begins with a theory digression about the topic of Coverage Path Planning. Then the algorithm chosen for the application in this thesis is explained in details and finally the \acrshort{ros} implementation of the algorithm is presented and discussed.
 \section{Problem Definition} % (fold)
 \label{sec:problem_definition}
 The area coverage problem can be abstractly described as follow:\par 
-\textit{Given} a convex or non convex shaped area $A \subset \mathbb{R}^2$ decomposed approximately by a finite set of regular cells $C = \{c_1, .., c_n\}$ such that, $A \approx \bigcup_{i=1}^{n} c_i$.\par
+\textit{Given} a convex or non convex shaped area $A \subset \mathbb{R}^2$ decomposed approximately by a finite set of cells $C = \{c_1, .., c_n\}$ such that, $A \approx \bigcup_{i=1}^{n} c_i$.\par
 \textit{Find} a coverage trajectory $P$ as a finite set of continuous way-points $p$, which can be written as $P = \{p_1, .., p_n\}$. Where each way-point corresponds to the centroid of a corresponding cell, thus $dim(P) = dim(C)$;
 Considering that valid solutions of P should not visit a way-point twice, the variable of interest to minimize is typically the path length and the number of changes in directions.
   % section problem_definition (end)
@@ -77,7 +77,7 @@ path of steepest ascent. In other words the robot moves away from the goal keepi
 \label{fig:wavefront}
 \end{figure}
 The pseudocode to obtain such behavior is listed in \autoref{alg:Wavefront-distance}. \todo{valutare se mettere l'algoritmo qui o dopo}
-A nice feature of this approach is that it is possible to set both starting and goal position. This comes in handy in cleaning or lawn mowing application. However, in some case this method can not avoid revisiting cells. Another shortcoming it is worth to highlight is the high number of turn in the coverage path. This is because the path follows the "spiral" of the distance transform wave front that radiates from the goal. A solution to this problem as will be presented in the next sections, could be to take into account other factors than only the distance from the goal.\par
+A nice feature of this approach is that it is possible to set both starting and goal position. This comes in handy in cleaning or lawn mowing application. However, in some case this method can not avoid revisiting cells. Another shortcoming it is worth to highlight is the high number of turn in the coverage path. This is because the path follows the "spiral" of the distance transform wave front that radiates from the goal. A solution could be to take into account other factors than only the distance from the goal.\par
 \begin{algorithm}
 	\SetKwData{SCell}{startCell}\SetKwData{CCell}{currentCell}\SetKwData{Cell}{cell}\SetKwData{Stop}{stop}\SetKwData{NeighborCell}{neighborCell}
 	\SetKwData{Left}{left}\SetKwData{This}{this}\SetKwData{Up}{up}
@@ -116,10 +116,16 @@ The \textit{Minimum-Spanning-Tree} (MST) method only considers the cells that ar
 
 \subsubsection{Close-loop Control methods (Online)} % (fold)
 \label{ssub:close_loop_control_method}
-Online approaches compute the coverage path \textit{in situ} based on sensor information, therefore unlikely offline counterpart does not require an \textit{a priori} knowledge of the environment. These methods usually formulate the coverage task as an optimization problem in which the goal is to minimize (e.g., sensor overlap) or maximize (e.g., sensing of uncovered area) a metric. Howard in \cite{PotFieldCPP} developed a method in which a continuous potential field is used to accomplish a coverage task using a team of mobile sensors. Sensors are repelled by obstacles and other team members and are consequently spread out in the area. This is a static and somehow primitive approach for CPP as it do not guarantee neither efficiency nor complete coverage, its aim is in fact to rapidly find hazards in a scenario involving hazardous materials leak in a damaged structure.\\
-Other approach consist in a control law composed of two components: i) a local component that is dependent on the coverage status of a local neighborhood, designed to direct the robot towards regions with high local coverage benefit and ii) a global component that depends on the global coverage status and directs the robot towards a point from where the robot can cover uncovered regions \cite{6385558}.\\ DA FAREREEEEEEJGFJDIJDIJFIJDIJIJD \
+Online approaches compute the coverage path \textit{in situ} based on sensor information, therefore unlikely offline counterpart does not require an a priori knowledge of the environment. These methods usually formulate the coverage task as an optimization problem in which the goal is to minimize (e.g., sensor overlap) or maximize (e.g., sensing of uncovered area) a metric. Howard in \cite{PotFieldCPP} developed a method in which a \textit{continuous potential field} is used to accomplish a coverage task using a team of mobile sensors. Sensors are repelled by obstacles and other team members and are consequently spread out in the area. This is a static and somehow primitive approach for CPP as it do not guarantee neither efficiency nor complete coverage, its aim is in fact to rapidly find hazards in a scenario involving hazardous materials leak in a damaged structure.\par
+Other approach consist in a control law composed of two components: i) a \textit{local component} that is dependent on the coverage status of a local neighborhood, designed to direct the robot towards regions with high local coverage benefit and ii) a \textit{global component} that depends on the global coverage status and directs the robot towards a point from where the robot can cover uncovered regions \cite{6385558}.\par
+A recent work by Song in \cite{8286947} present the \textit{$\varepsilon$-algorithm} (that stands for $\varepsilon$-STAR or “$\varepsilon$-coverage via structural transitions to abstract resolutions”), where $\varepsilon$ refers to the cell resolution. As shown in \autoref{fig:ETM-online-CPP}, the algorithm utilizes an Exploratory Turing Machine (ETM), that consists of a two dimensional multilevel tape formed by Multiscale Adaptive Potential Surfaces (MAPS). The ETM stores and updates the information corresponding to unexplored, explored, and obstacle-occupied regions, as time-varying potentials on MAPS. In essence, it takes advantage of both the potential field-based and sensor-based planning methods by incrementally building the MAPS using real-time sensor measurements. The ETM acts as a supervisor to the autonomous vehicle and guides it with adaptive navigation commands.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/C3/ETM-online-CPP.png}
+    \caption{ETM as a supervisor of the autonomous vehicle \cite{8286947}}
+    \label{fig:ETM-online-CPP}
+\end{figure}
 
-A recent work by Song in \cite{8286947} present the $\varepsilon$-algorithm (that stands for $\varepsilon$-STAR or “$\varepsilon$-coverage via structural transitions to abstract resolutions”), where $\varepsilon$ refers to the cell resolution. As shown in Fig. 1, the algorithm utilizes an Exploratory Turing Machine (ETM), that consists of a twodimensional multilevel tape formed by Multiscale Adaptive Potential Surfaces (MAPS). The ETM stores and updates the information corresponding to unexplored, explored, and obstacle-occupied regions, as time-varying potentials on MAPS. In essence, it takes advantage of both the potential field-based and sensor-based planning methods by incrementally building the MAPS using real-time sensor measurements. While, by default, the ETM uses the lowest level of MAPS for generating the coverage path online, it switches to higher levels as needed to escape from a local extremum. The ETM acts as a supervisor to the autonomous vehicle and guides it with adaptive navigation commands.
 % subsubsection close_loop_control_method (end)
 
 % subsection coverage_path_planning_for_mobile_robots (end)
@@ -196,7 +202,7 @@ Therefore it has been decided to go for $10m \times 10m$ cells and fly at an alt
 % subsection workplace_sampling (end)
 \subsection{ROS Node Architecture} % (fold)
 \label{sub:ros_node_architecture}
-The coverage path planning algorithm is implemented in the ROS node named \textit{/coverage\_path\_planner}. The graph in \autoref{fig:CPP-rqt-graph} display the nodes and topics related to the CPP procedure.
+The coverage path planning algorithm is implemented in the \acrshort{ros} node named \textsf{coverage\_path\_planner}. The graph in \autoref{fig:CPP-rqt-graph} display the nodes and topics related to the CPP procedure.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\textwidth]{figures/C3/CPP-rqt-graph.png}
@@ -205,23 +211,26 @@ The coverage path planning algorithm is implemented in the ROS node named \texti
 \end{figure}
 The scope of the other nodes that appear in the graph are:
 \begin{description}
-	\item[\textit{/mission\_controller}] It handles all the mission operations as discussed in \autoref{cha:georeferencing_the_mission_s_environment}
-	\item[\textit{/terrain\_data\_provider}] It provides a service (this is why in the graph it is isolated) which allow the CPP node to request terrain data. It access to Google elevation databases using the Google elevation API. The inquiry is done in the form of an URL request through the python library \textit{urllib} \cite{urllib}. 
-	\item[\textit{/kml\_generator}] It generates a KML file from the CPP generated path. This task is not needed during the mission but it is of great help in debugging and for better display the CPP output.
+	\item[\textsf{mission\_controller}] It handles all the mission operations as discussed in \autoref{cha:georeferencing_the_mission_s_environment}
+	\item[\textsf{terrain\_data\_provider}] It provides a service (this is why in the graph it is isolated) which allow the CPP node to request terrain data. It access to Google elevation databases using the Google elevation API. The inquiry is done in the form of an URL request through the python library \textsf{urllib} \cite{urllib}. 
+	\item[\textsf{kml\_generator}] It generates a KML file from the CPP generated path. This task is not needed during the mission but it is of great help in debugging and for better display the CPP output.
 \end{description}
 The \textit{Coverage Path Planner} node task can be further divided in five sub-operations:
 \begin{enumerate*}[label={(\arabic*)}]
 	\item Approximate cellular Decomposition;
-	\item Wave-front Propagation Algorithm;
 	\item Choosing Starting Position
+	\item Wave-front Propagation Algorithm;
 	\item Coverage Path Generator;
 	\item Spline Interpolation;
 \end{enumerate*}
+ In the following sections, first the definition of relevant \acrshort{ros} messages is given, then each sub-task is analyze separately. For parts where coding has required additional steps and consideration the implementation is analyze more in details, otherwise only the pseudocode is given for clarity and readability reasons. Anyway the whole code is accessible on the project GitHub page \cite{bambiProjectGit}.
 \subsubsection{Relevant Messages Definition} % (fold)
 \label{ssub:relevant_messages_definition}
-
+Ros nodes communicate using messages over different topics. There are many build-in messages already defined in \acrshort{ros}, anyway it has been necessary to define custom messages for the specific use case. The definition of relevant messages is given in \autoref{list:msg-CPP}
+\lstinputlisting[label=list:msg-CPP, caption=Relevant message definition for CPP node, language=Python]{listings/C3/relevant-ros-messages.msg}
+The \textit{coverage path planner} node receives the \textsf{FieldCoverageInfo} message subscribing to the topic \textsf{/bambi/mission\_controller/trigger\_path\_generation}. The message contains the field contour data in the member type \textsf{bambi\_msg/Field} and additional information such as \textit{sensor footprint}, scanning altitude, return to home altitude, current global position and home global position. Once the path is generated the node publish a \textsf{path} message on the topic \textsf{/bambi/coverage\_path\_planner/path} 
 % subsubsection relevant_messages_definition (end)
-In the following sections, the specification of each sub-task is explained as well as its implementation.
+
 % subsection ros_node_architecture (end)
 \subsection{Approximate Cellular Decomposition} % (fold)
 \label{sub:approximate_cellular_decomposition}
@@ -259,12 +268,30 @@ The cells dimension has been already computed as discussed before, thus the grid
 \end{algorithm}
 \subsubsection{Implementation} % (fold)
 \label{ssub:implementation}
-La questione della conversione delle coordinate
+The implementation of the cellular decomposition in C++ begins with the conversion of field border geo-points from \acrshort{wgs84}\footnote{See \autoref{sec:theory_background} of \autoref{cha:georeferencing_the_mission_s_environment}} to \acrshort{utm}\footnote{\acrfull{utm} conformal projection uses a 2-dimensional Cartesian coordinate system to give locations on the surface of the Earth. The units used are meters} coordinate. This is required to obtain X (easter coordinate in \acrshort{utm}) and Y (norther coordinate in \acrshort{utm})) coordinates of each point in meters and construct the polygon representing the field.
+In practice the conversion is achieved using the \textsf{geodesy} ROS package (see \cite{geodesyROS}).\par
+The polygon is represented with the C++ type \textsf{boostFieldBorderPolygon} which is part of the \textsf{Boost.Geometry} library \cite{boostGeometryLib}. To define it is just required to add point-by-point the outer contour. A snapshot of the code which perform this first part of the decomposition is given in \autoref{list:cellular-decompostion-CPP}.\par
+The code implementing the \autoref{alg:Bambi-grid-decomposition} is not listed because it do not add anything relevant to what already seen in the pseudocode except the specific C++ syntax and definition. An example of the output matrix is displayed in \autoref{fig:field3-decomposition-matrix} where the cells which are part of the field are marked with "XX" otherwise with "-2".
+\todo{decidere se invece inserirlo, c'e gia il listing in listing/C3}
+\lstinputlisting[label=list:cellular-decompostion-CPP, caption=Coordinates transformation and polygon construction in C++ , language=C++]{listings/C3/cellular-decomposition-1.cpp}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/C3/Field3/Field3-decomposition-matrix.png}
+    \caption{Example of Cellular Decomposition Matrix}
+    \label{fig:field3-decomposition-matrix}
+\end{figure}
+
 % subsubsection implementation (end)
 % subsection approximate_cellular_decomposition (end)
+\subsection{Choosing Starting Position} % (fold)
+\label{sub:choosing_starting_position}
+For this specific use case there is no constraint in the choice of the starting position other that it should be inside the target area. Hence it makes sense to select a smart starting position so that the path planner could generate an efficient path. After some test it seems that a good starting position is the one corresponding to the most isolated cell. Isolated in the sense that it is the cell with the lowest number of neighbors having the same cost. Among all the candidate cells, it is selected the one having the higher cost value (i.e the furthest from the goal cell).
+\todo{Fare algoritmo per starting cell selection}
+
+% subsection choosing_starting_position (end)
 \subsection{Wave-front Propagation Algorithm} % (fold)
 \label{sub:wave_front_propagation_algorithm}
-Being $G$ the grid graph, where each element represent a cell through its centroid.
+Being $G$ the grid graph, where each element represents a cell through its centroid.
 Consider the navigation function: $\phi:\, G \rightarrow [1, \infty]$ which has the properties as a potential function. For the goal cell, the navigation cost $\phi(c_G)=1$ and the further the cell position to the goal cell the larger the navigation cost\footnote{In the actual implementation only distance transformation has been taken into account as cost function.}.
 Once the cost has been assigned to each cell the planner algorithm will find the path which guarantees that all cells having an higher value then the goal cell are visited before the robot reaches the goal.\par
 
@@ -315,17 +342,8 @@ The initial wavefront is $ W_0$, which represents the states where the current c
 \caption{Filling matrix using Wavefront propagation starting from the \textit{goal} cell}
 \label{alg:Bambi-Wavefront}
 \end{algorithm}
-\subsubsection{Implementation} % (fold)
-\label{ssub:implementation}
-
-% subsubsection implementation (end)
 % subsection wave_front_propagation_algorithm (end)
 
-\subsection{Choosing Starting Position} % (fold)
-\label{sub:choosing_starting_position}
-The
-
-% subsection choosing_starting_position (end)
 \subsection{Coverage Path Generator} % (fold)
 \label{sub:coverage_path_generator}
 Once the elements matrix has been filled according to the cost function, the last step is to generate the path which assure that each cell is visited. This is done through a gradient ascending searching algorithm from the start cell. All the unvisited neighbors of the current cell are evaluated and for each is given a \textit{priority}. The neighbor having the higher priority is appointed and selected as the current cell for the next step of the iteration. The process continues until there are no more unvisited neighbors.\par
@@ -366,29 +384,46 @@ The pseudocode which plan the coverage path is listed in \autoref{alg:Bambi-path
 			\Matrix{\CCell} $\leftarrow$ Covered\;
 			\P.\pushBack{\getCentroidCoordinates{\CCell}} \;
 			\CCell $\leftarrow$ \bestChoice \;
-
 		}
 	}
 \caption{Generating Coverage Path}
 \label{alg:Bambi-pathPlanner}
 \end{algorithm}
 
-\subsubsection{Implementation} % (fold)
-\label{ssub:implementation}
-
-% subsubsection implementation (end)
 % subsection coverage_path_generator (end)
 \subsection{Spline Interpolation} % (fold)
 \label{sub:spline_interpolation}
-The resulting coverage path is a piecewise function in the local reference system made up of segment connecting the center of the cells in the order provided by the algorithm shown in \autoref{sub:coverage_path_generator}. Therefore it is not 
-
-
-
-
-
+The resulting coverage path is a piecewise function in the local reference system made up of segment connecting the center of the cells in the order provided by the algorithm shown in \autoref{sub:coverage_path_generator}. Therefore the outcome path is really sharply and edgy. Before sending the trajectory to the vehicle it is then required to smooth it. This is done using spline interpolation. Spline interpolation is a form of interpolation where the interpolant is a special type of piecewise polynomial called a spline. This subject goes outside the  scope of the thesis, thus only the implementation is given.
 
 \subsubsection{Implementation} % (fold)
 \label{ssub:implementation}
+The implementation in C++ relay on the \textit{cpp-spline} Library provided by Xianshun Chen who make it available on GitHub \cite{cpp-spline}. \autoref{fig:CPP-matlab} shows the path before and after the interpolation. The smoothing effect is evident since the algorithm produce a piecewise function imposing continuity up to second order derivative. This positive features comes at the expenses of accuracy, because the resulting spline does not exactly pass through every given point as evidenced in \autoref{fig:interpolation-error}. Fortunately this inaccuracy has a little impact on coverage performance due to sensor overlap considered in the computation of the flight altitude (see \autoref{sub:workplace_sampling}).
+\begin{figure}[ht]
+\centering
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \includegraphics[width=.99\linewidth]{figures/C3/CPP-path-marker.eps}
+  \caption{}
+  \label{sfig:CPP-path-matlab}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \includegraphics[width=.99\linewidth]{figures/C3/CPP-path-spline.eps}
+  \caption{}
+  \label{sfig:CPP-path-spline-matlab}
+\end{subfigure}
+\caption{CPP path (\subref{sfig:CPP-path-matlab})before and (\subref{sfig:CPP-path-spline-matlab})after interpolation}
+\label{fig:CPP-matlab}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/C3/Interpolation-error.eps}
+    \caption{Interpolation error}
+    \label{fig:interpolation-error}
+\end{figure}
+
+
 
 % subsubsection implementation (end)
 % subsection spline_interpolation (end)
@@ -402,6 +437,123 @@ The resulting coverage path is a piecewise function in the local reference syste
 
 \section{Simulation Results} % (fold)
 \label{sec:simulation_results}
+The PX4 flight stack firmware offers a great \acrfull{sitl} simulation environment which was fundamental in develop the software. In fact, it provides a real-time, safe and convenient way to test the software implementation without all the risks related to a real flight. \\
+
+\subsection{Simulation Environment} % (fold)
+\label{ssec:simulation_environment}
+The simulation environment consist of:
+\begin{itemize}
+ 	\item \textbf{PX4 \acrshort{sitl}}: The PX4 simulated hardware which reacts to the simulated given input exactly as it would react in the reality and issues the output as a percentage of the total thrust that every rotor has to provide.
+ 	\item \textbf{Gazebo}: The dynamics simulator that is used by the SITL. This software reads the PX4 output and, by elaborating the modeled dynamics, provides the simulated input to the PX4. This allows for a quite accurate simulation of the real model behavior during flight.
+ 	\item \textbf{\acrshort{ros}}: the robotics middleware over which the Bambi Project software (in the form of package) runs.
+ 	\item \textbf{\acrshort{qgc}}: the ground control station used to send the mission start/stop (see appendix \ref{appendix:mavlink}) command and to monitor all the \acrshort{uav} parameters during flight.
+ \end{itemize}
+ The different parts of the system (\autoref{fig:SITL-architecture}) are connected via UDP, and can be run on either the same computer or another computer on the same network. The communication protocol is MAVLink (see appendix \ref{appendix:mavlink}). \\
+ The following simulations has been carried out on a single PC running Ubuntu 16.04LST.
+ \begin{figure}[ht]
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/C4/Px4_sitl_overview}
+    \caption{SITL with Gazebo architectural scheme}
+    \label{fig:SITL-architecture}
+\end{figure}
+
+Gazebo offers the possibility to load a satellite map through the \textsf{StaticMap} plugin\footnote{documentation at \url{http://gazebosim.org/tutorials?tut=static_map_plugin&cat=build_world}}. In this way the simulation environment (\autoref{fig:gazebo-Map}) represents \todo{depicts????} quite accurately the real world scenario.
+The vehicle used in simulation environment is the 3DR Iris (\autoref{fig:gazebo-iris}), because its model was already created by PX4 team along with different sensors like the 2D 360\degree\ lidar that was used to test object avoidance.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.7\linewidth]{figures/C3/gazebo-ground-plane-world.png}
+  \caption{Gazebo satellite ground plane}
+  \label{fig:gazebo-Map}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.5\linewidth]{figures/C3/simulation/iris-model1.jpg}
+  \caption{Gazebo 3DR iris model}
+  \label{fig:gazebo-iris}
+\end{figure}
+% section simulation_Environment (end)
+
+\subsection{Starting Bambi Mission} % (fold)
+\label{sub:starting_bambi_mission}
+Mission start and stop command are issue using the \acrshort{qgc} custom command widget displayed in \autoref{fig:qgc-widget}. This widget was written in \acrfull{qml} an user interface markup language providing an easy way to write simple GUIs.\\
+The button \textsf{BAMBI MISSION START} automatically send the mission start message while \textsf{BAMBI MISSION STOP} send the mission abort message which according to the current mission state causes the \acrshort{uav} to return to the home position or to immediately land at the current position.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/C3/simulation/qgc-widget.png}
+  \caption{QGC Bambi's custom command widget}
+  \label{fig:qgc-widget}
+\end{figure}
+% subsection starting_bambi_mission (end)
+
+\subsection{Testing CPP algorithm} % (fold)
+\label{sub:testing_cpp_algorithm}
+In order to test the \acrlong{cpp} algorithm it would be necessary to run through the whole mission steps and until the mission controller issue the \textsf{FieldCoverageInfo} message triggering the \acrshort{cpp} node. Therefore to save the time required by the drone to perform the first mission tasks it is convenient to publish a "fake" message directly over the \textsf{/bambi/mission\_controller/trigger\_path\_generation} topic. This is performed executing a simple bash script calling the \textsf{rostopic pub} command.\par
+The algorithm was tested using different sample fields. The results obtained for three of them are displayed in \autoref{fig:Coverage-pathGE}. The cellular decomposition consist of $10 \times 10$ cells. \autoref{tbl:fields-area-length} reports the path length compared to the field area which as expected is greater for larger fields.\par \todo{\\ FARE ALTRA SUBSUBSECTION PER I COMMENTI???}
+Overall, the generated path is satisfactory for the desired purpose even if, in some section, there are turns which would be nice to avoid. This is accentuated especially when the workplace has a complex shape (\autoref{sfig:F2-CPP-path}). This shortcoming is something expected, in fact, at the actual development stage only the distance from the goal point is used as cost function in the wave-front propagation algorithm, therefore no optimization for reducing turns has been implemented (see \autoref{sub:wave_front_propagation_algorithm}). The distance transformation used, in fact, leads to a spiral like behavior near the goal cell (discussed in \autoref{ssub:grid_based_methods}), thus it is convenient to set the goal position (home position in the mission) at an extremity of the field.
+
+% subsection testing_cpp_algorithm (end)
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Field}} & \multicolumn{1}{c|}{\textbf{Area}} & \multicolumn{1}{c|}{\textbf{Path Length}} \\ \hline
+1                                    & $15444\, m^2=1.5444\, ha$          & $2.17\, Km$                               \\ \hline
+2                                    & $50665\, m^2=5.0665\, ha$          & $5.56\, Km$                               \\ \hline
+3                                    & $41586\, m^2=4.1586\, ha$          & $4.66\, Km$                               \\ \hline
+\end{tabular}
+ \caption{Comparison between field extension and coverage path length}
+ \label{tbl:fields-area-length}
+\end{table}
+
+\begin{figure}[ht]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+	  \centering
+	  \includegraphics[width=.9\linewidth]{figures/C3/WaldpeterField/Waldpeter-CoverageGE.jpg}
+	  \caption{Field 1}
+	  \label{sfig:F1-CPP-path}
+	\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+	  \centering
+	  \includegraphics[width=.9\linewidth]{figures/C3/Field2/Field2-CoverageGE.jpg}
+	  \caption{Field 2}
+	  \label{sfig:F2-CPP-path}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+	  \centering
+	  \includegraphics[width=.9\linewidth]{figures/C3/Field3/Field3-CoverageGE.jpg}
+	  \caption{Field 3}
+	  \label{sfig:F3-CPP-path}
+	\end{subfigure}
+	\caption{CPP output path applied to different shaped fields}
+    \label{fig:Coverage-pathGE}
+\end{figure}
+
+\subsubsection{Different Starting and Goal Positions} % (fold)
+\label{ssub:different_starting_and_goal_positions}
+
+% subsubsection different_starting_and_goal_positions (end)
+
+\begin{figure}[ht]
+	\centering
+	\begin{subfigure}{1\textwidth}
+	  \centering
+	  \includegraphics[width=.9\linewidth]{figures/C3/Field3/Field3-CoverageGE-BSpline-noBorder.jpg}
+	  \caption{}
+	  \label{sfig:F3-regular-start-pos}
+	\end{subfigure}
+	\begin{subfigure}{1\textwidth}
+	  \centering
+	  \includegraphics[width=.9\linewidth]{figures/C3/Field3/Field3-CoverageDifferentStartingPosition.jpg}
+	  \caption{}
+	  \label{sfig:F3-modified-start-pos}
+	\end{subfigure}
+	\caption{Coverage Path generated with: (\subref{sfig:F3-regular-start-pos}) \textit{Computed} and (\subref{sfig:F3-modified-start-pos}) \textit{Custom} starting position}
+    \label{fig:SITL-architecture}
+\end{figure}
+
+
 \textit{Qui mostrero' l'output dell'algoritmo rappresentato come tracciato su google earth. verranno messi a confronto diverse scelte di starting e goal point e discutero' delle performance ottenute con relativi problemi da risolvere}
 
 \textit{\textbf{Mostrare importanza della scelta della starting position + bezier vs spline interpolation}}
