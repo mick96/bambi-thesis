@@ -2,7 +2,7 @@
 
 
 
-In this introduction it is first briefly described the motivation, objective and scope of the project this thesis has been developed in. Once the background has been well set and explained, this written work will elaborate in details the specific problems of \textit{agricultural field detection and representation} and \textit{Coverage Path Planning}
+In this introduction it is first briefly described the motivation, objective and scope of the project this thesis has been developed in. Once the background has been well set and explained, this written work will elaborate in details the specific subject of \textit{georeferencing and represent an agricultural field} and \textit{Coverage Path Planning} algorithm.
 \section{Bambi Project} % (fold)
 \label{sec:bambi_project}
 
@@ -46,7 +46,7 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
 
 \section{UAV Usage for Wildlife Research} % (fold)
 \label{sec:state_of_the_art}
- During last years, the increasing interest and development of UAS (Unmanned Aircraft System) makes them affordable and suitable for many different applications. Specifically, in wildlife research, drones are frequently use as they are less expensive, quieter, and safer than traditional manned aircraft. Most studies we reviewed recorded minimal or no visible behavioral responses to UAS; however, UAS are capable of causing behavioral and physiological responses in wildlife when observing at close range. \cite{doi:10.1002/fee.1281}.\\
+ During last years, the increasing interest and development of \acrfull{uav} makes them affordable and suitable for many different applications. Specifically, in wildlife research, drones are frequently use as they are less expensive, quieter, and safer than traditional manned aircraft. Most studies we reviewed recorded minimal or no visible behavioral responses to \acrshort{uav}; however, \acrshort{uav} are capable of causing behavioral and physiological responses in wildlife when observing at close range. \cite{doi:10.1002/fee.1281}.\par
  For the case under-study, the "Flying Wildlife Finder", represents the state-of-the-art.
  The project, developed by the German Aerospace Center (DLR), is an application system which prevents accidents by detecting animals hidden in tall grass during the hay harvest. 
  The "Flying Wildlife Finder", a remotely controlled aerial drone equipped with sensors and a GPS link, is sent on a reconnaissance flight before mowing starts. A high resolution thermal imaging camera detects the temperature of animals hidden in the grass, which is higher than the ambient temperature of the field. Once the animal is located a search party is led to the fawn’s resting place with the help of GPS.
@@ -62,7 +62,7 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
 
  \subsection{Project Goals} % (fold)
  \label{sec:bambisaver_goals}
- The scope of the Bambi project is to design an integrated system capable to autonomously handle every steps of the mission so that it can be operated also by untrained personals. This must be guaranteed even in adverse environments, especially in uneven fields as it is in upland regions. \todo{????the idea was developed having the mountain of Trentino Altoadige in mind????}
+ The scope of the Bambi project is to design an integrated robotized system capable to autonomously handle every steps of the mission so that it can be operated also by untrained personals. This must be guaranteed even in adverse environments, especially in uneven fields as it is in upland regions. \todo{????Citare il trentino????}
  Along with this, it is of particular interest to keep modularity in every hardware and software components. This is to permit easier implementation of new features or improvements.
  All this guidelines \todo{sinonimo per dire idee alla bass} have been taken into account during the design and implementation stages (i.e. \acrshort{ros} as framework for the on-board computer).
 
@@ -75,7 +75,7 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
     \caption{Nodes and Topics graph}
     \label{fig:rqtgraph}
 \end{figure}\\
- In the following chapter the thesis will focus on two parts of the project:
+ In the following chapter the thesis will expand on two parts of the project:
  \begin{itemize}
   	\item \textit{Geo-referencing the mission's environment and get the field boundary}. This is of great importance, as it define the mission's range which is fundamental for every successive tasks.
   	\item \textit{Planning the coverage path}. It regards planning the geometric path so that the whole field of interest is covered by the sensor footprint.
