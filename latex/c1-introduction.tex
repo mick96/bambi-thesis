@@ -68,7 +68,7 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
 
  \subsection{Software Architecture concept} % (fold)
  \label{sub:software_design}
- The raspberry Pi 3 it is used as on-board computer, it runs \acrshort{ros} (see appendix \ref{appendix:ros}) and manages the transition between the different mission's phases. The software develops according to the usual \acrshort{ros} philosophy \cite{288}, thus it is composed of five nodes implementing every mission component as an independent module. \autoref{fig:rqtgraph} displays all the nodes and the related topics used to let them communicate.
+ The raspberry Pi 3 it is used as on-board computer, it runs \acrshort{ros} (see appendix \ref{appendix:ros}) and manages the transition between the different mission's phases. The software develops according to the usual \acrshort{ros} philosophy \cite{288}, thus it is composed of six nodes implementing every mission component as an independent module. \autoref{fig:rqtgraph} displays all the nodes and the related topics used to let them communicate. The \textsf{mission\_controller} node, in the center of the graph, handle all the mission procedures and timing implementing a FSM (\textit{Final State Machine}).
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1.4\textwidth, angle=270]{figures/C1/rqtgraph.eps}
@@ -79,13 +79,26 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
  \begin{itemize}
   	\item \textit{Geo-referencing the mission's environment and get the field boundary}. This is of great importance, as it define the mission's range which is fundamental for every successive tasks.
   	\item \textit{Planning the coverage path}. It regards planning the geometric path so that the whole field of interest is covered by the sensor footprint.
+
   \end{itemize}
  \todo {introdurre la parte che e' invece discussa nell'altra tesi??}
+
 
 \textit{Da fare una intro ai due problemi}
   % subsection software_design (end)
 
- 
+\section{Geo-referencing Mission's Environment} % (fold)
+\label{sec:geo_referencing_mission_s_environment}
+\autoref{cha:georeferencing_the_mission_s_environment} develops the subject of Georeferencing the mission's environment dividing it into two different tasks: 
+\begin{enumerate}
+  \item Get an orthorectified photo of the workplace, thus an uniform scaled pictures of the field with the same lack of distortion as a map and having geo-position information encoded into it.
+  \item Detect the field border and store it in a standard format that is commonly used to encode geographic features.
+\end{enumerate}
+In first place, it is explained what is orthorectification and the process to achieve it. Then free orthophoto database are presented with a special care for Google Imagery database and Google Earth application.
+Google Earth provides a toolbox to trace path over the map. This is used to define the field boundary easily directly on the orthophoto and later to save it in \acrfull{kml}. The main features of \acrshort{kml} is therefore illustrated as well as how to handle it in Python script.
+
+
+% section geo_referencing_mission_s_environment (end)
 
 % \section{Innovation} % (fold)
 % \label{sec:innovation}
