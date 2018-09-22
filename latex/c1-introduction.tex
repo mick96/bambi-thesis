@@ -9,16 +9,16 @@ In this introduction it is first briefly described the motivation, objective and
 % section bambi_project (end)
 \subsection{Motivation} % (fold)
 \label{ssec:motivation}
- Deers gives birth to their offspring during April and May \cite{MowlingMortality}, often choosing meadows as they consider it a safe spot. This period is unfortunately the same in which meadows are cut. The results is that every year a great number of young deers fall victim of combine harvesters cutting hay. Germany counts about 100000 death every harvest season \cite{MowlingMortality}.
+ Deers gives birth to their offspring during April and May \cite{MowlingMortality}, often choosing meadows as they consider it a safe spot. This period is unfortunately the same in which meadows are cut. The results is that every year a great number of young deers fall victim of combine harvesters cutting hay. Germany counts about 100000 death every harvest season \cite{MowlingMortality}.\par
  The BambiSaver project was born aiming to provide an autonomous, fast and user friendly device able to search and locate, living creatures in agricultural areas. It is, as a matter of fact, difficult to locate small animals hidden in vast grasslands especially if they freeze when they feel under threat. For this specific reason the proposal design is based on an \acrfull{uav}\cite{ICAO} and more precisely a quad-copter equipped with a thermal camera.
- An aerial vehicle is, in fact, able to efficiently cover large surfaces way faster then any other ground alternatives and guarantees the best viewpoint for the specific kind of wildlife research. Moreover it has been chosen a copter rather than a fixed wing model for its holonomic properties which turns out to be very useful in upland regions as well as for small and irregular fields. It is basically why in search and rescue operations helicopters are often adopted instead of planes.
+ An aerial vehicle is able to efficiently cover large surfaces way faster then any other ground alternatives and guarantees the best viewpoint for the specific kind of wildlife research. Moreover, it has been chosen a copter rather than a fixed wing model for its holonomic properties which turns out to be very useful in upland regions as well as for small and irregular fields. It is basically why in search and rescue operations helicopters are often adopted instead of planes.
 
 \subsection{Importance for Wildlife and for Agricultural}
 \index{Agriculture}
-In early hunting literature from as far back as the mid-19th century, references can be found to significant losses of breeding partridges and pheasants from the use of sickle and scythe. Due to the fierce competition in the agricultural sector, developments in agricultural technology have brought about a tremendous acceleration in mowing techniques, with tendency still rising. Today, mowing speed can even exceed 15 km/h, while at the same time ever-wider mowers are used. Nesting birds, young hares and fawns are regular victims of such mowers and even full-grown wild animals cannot always escape. Ever since the 1950s, the importance of silage meadows has increasingly taken precedence over the traditional hay harvest.
+In early hunting literature from as far back as the mid-19th century, references can be found to significant losses of breeding partridges and pheasants from the use of sickle and scythe. Due to the fierce competition in the agricultural sector, developments in agricultural technology have brought about a tremendous acceleration in mowing techniques, with tendency still rising. Today, mowing speed can even exceed 15 km/h, while at the same time ever-wider mowers are used. Nesting birds, young hares and fawns are regular victims of such mowers and even full-grown wild animals cannot always escape.
 
-\subsection{Affected Species} % (fold)
-\label{sub:affected_species}
+\subsubsection{Affected Species} % (fold)
+\label{ssub:affected_species}
 Grassland is used by countless species of wildlife as food, cover and reproduction habitat. Apart from leverets, fawns and various field birds, small mammals, amphibians and insects all fall victim to the practice of early and more frequent mowing. Formerly reliable survival strategies proven successful over thousands of years have a devastating effect in mowing situations. The instinct of the brooding partridge hen to sit tight on her nest, or of the hare or fawn to freeze motionless, now prove fatal. The optimized patterns of predator avoidance behavior which wild animals have evolved can no longer keep up with the developments in modern cultivation techniques.
 \begin{figure}[ht]
     \centering
@@ -28,7 +28,7 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
 \end{figure}
 
 
-% subsection affected_species (end)
+% subsubsection affected_species (end)
 
 \subsection{Measure to Reduce Wildlife Losses} % (fold)
 \label{sub:measure_to_reduce_wildlife_losses}
@@ -41,7 +41,7 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
 	\item \textit{Mowing frequency}: a longer interval between first and second cuttings reduces the mortality rate, especially for ground-nesting birds.
 	\item \textit{Mowing technology}: cutter-bar mowers cause less harm to wild animals than rotary mowers.
 \end{itemize}
- Another practical approach is the one adopted in a German wildlife rescue project which consists in deploying small aerial drones to find young deer hiding in tall grass.
+A practical approach which do not impact mowing strategy is the one adopted in a German wildlife rescue project consisting in deploying small aerial drones to find young deer hiding in tall grass.
 % subsection measure_to_reduce_wildlife_losses (end)
 
 \section{UAV Usage for Wildlife Research} % (fold)
@@ -55,16 +55,25 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
  
 % section state_of_the_art (end)
  
- \section{Proposal Solution} % (fold)
+ \section{Bambi Project} % (fold)
  \label{sec:proposal_solution}
- In the following section it is briefly explained the goals and design guidelines of the project.
+ Bambi Project aims to make the coverage flight over agricultural flight completely automatic for the purpose of wildlife rescuing. For this reason the following steps has to be carried out autonomously by the vehicle:
+ \begin{enumerate}
+   \item Takeoff and reaching a position where having a complete view of the field so to shout a photo of the whole field.
+   \item Generate a georeferenced photo of the field, identify the field boundary and store it as a geographic polygon (set of \acrshort{gps} coordinates).
+   \item Calculate the \textit{coverage path}.
+   \item Generate a \textit{timed dependent trajectory} taking into account dynamic constraints of the vehicle.
+   \item Make the drone to follow the computed trajectory while avoiding obstacles.
+   \item Interrupt the flight when the thermal camera sense a spot having an higher temperature with respect to the field and guide the user to the target location.
+   \item When the field has been completely covered return to home position.
+ \end{enumerate}
  % section proposal_solution (end)
 
  \subsection{Project Goals} % (fold)
  \label{sec:bambisaver_goals}
- The scope of the Bambi project is to design an integrated robotized system capable to autonomously handle every steps of the mission so that it can be operated also by untrained personals. This must be guaranteed even in adverse environments, especially in uneven fields as it is in upland regions. \todo{????Citare il trentino????}
- Along with this, it is of particular interest to keep modularity in every hardware and software components. This is to permit easier implementation of new features or improvements.
- All this guidelines \todo{sinonimo per dire idee alla bass} have been taken into account during the design and implementation stages (i.e. \acrshort{ros} as framework for the on-board computer).
+ The scope of the Bambi project is to ease a lot wildlife rescuing using \acrshort{uav} so that it can be handled also by untrained people. This must be guaranteed even in adverse environments, especially for uneven fields as it is in upland regions.
+ Along with this, it is of particular interest to keep modularity in every hardware and software components. This is to permit easier implementation of new features or improvements to existing ones.
+ All this basic concepts have been used as guidelines during the design and implementation stages (e.g. the choice of \acrshort{ros} as framework for the whole software).
 
  \subsection{Software Architecture concept} % (fold)
  \label{sub:software_design}
@@ -75,30 +84,30 @@ Grassland is used by countless species of wildlife as food, cover and reproducti
     \caption{Nodes and Topics graph}
     \label{fig:rqtgraph}
 \end{figure}\\
- In the following chapter the thesis will expand on two parts of the project:
+ In the following chapter the thesis will examine in particular two parts of the project:
  \begin{itemize}
   	\item \textit{Geo-referencing the mission's environment and get the field boundary}. This is of great importance, as it define the mission's range which is fundamental for every successive tasks.
   	\item \textit{Planning the coverage path}. It regards planning the geometric path so that the whole field of interest is covered by the sensor footprint.
-
   \end{itemize}
- \todo {introdurre la parte che e' invece discussa nell'altra tesi??}
-
-
-\textit{Da fare una intro ai due problemi}
   % subsection software_design (end)
 
 \section{Geo-referencing Mission's Environment} % (fold)
 \label{sec:geo_referencing_mission_s_environment}
-\autoref{cha:georeferencing_the_mission_s_environment} develops the subject of Georeferencing the mission's environment dividing it into two different tasks: 
+Chapter \ref{cha:georeferencing_the_mission_s_environment} develops the subject of Georeferencing the mission's environment dividing it into two different tasks: 
 \begin{enumerate}
   \item Get an orthorectified photo of the workplace, thus an uniform scaled pictures of the field with the same lack of distortion as a map and having geo-position information encoded into it.
   \item Detect the field border and store it in a standard format that is commonly used to encode geographic features.
 \end{enumerate}
 In first place, it is explained what is orthorectification and the process to achieve it. Then free orthophoto database are presented with a special care for Google Imagery database and Google Earth application.
-Google Earth provides a toolbox to trace path over the map. This is used to define the field boundary easily directly on the orthophoto and later to save it in \acrfull{kml}. The main features of \acrshort{kml} is therefore illustrated as well as how to handle it in Python script.
-
+Google Earth provides a toolbox to trace path over the map. This is used to define the field boundary easily directly on the orthophoto and later to save it in \acrfull{kml}. The main features of \acrshort{kml} is therefore illustrated as well as how to handle it in Python scripts.
 
 % section geo_referencing_mission_s_environment (end)
+
+\section{Coverage Path Planning} % (fold)
+\label{sec:coverage_path_planning}
+In \autoref{cha:coverage_path_planning} the topic of \acrfull{cpp} is explained providing a basic knowledge of the existent approaches to the problem.\par
+\acrlong{cpp} is the task of determining a path that passes over all points of an area or volume of interest while avoiding obstacles. This task is integral to many robotic applications, such as vacuum cleaning robots, painter robots, autonomous underwater vehicles creating image mosaics, demining robots, lawn mowers, automated harvesters, window cleaners and inspection of complex structures. That is why it is an important problem in \textit{mobile robot navigation} and even if the research about this issue developed rapidly, the governing algorithm to efficiently find the optimal path has not been found yet.
+% section coverage_path_planning (end)
 
 % \section{Innovation} % (fold)
 % \label{sec:innovation}

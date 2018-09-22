@@ -1,5 +1,5 @@
 %!TEX root = bambi-thesis.tex
-This chapter begins with a theory digression about the topic of Coverage Path Planning. Then the algorithm chosen for the application in this thesis is explained in details and finally the \acrshort{ros} implementation of the algorithm is presented and discussed.
+This chapter begins with a theory digression about the topic of \acrlong{cpp}. Then the algorithm chosen for the application in this thesis is explained in details and finally the \acrshort{ros} implementation of the algorithm is presented and discussed.
 \section{Problem Definition} % (fold)
 \label{sec:problem_definition}
 The area coverage problem can be abstractly described as follow:\par 
@@ -58,9 +58,7 @@ Another largely used method in coverage path planning divides the environment in
 The algorithms using this grid-based representation should plan a path which visit all the empty cells of the grid minimizing the traveling cost. Primitive criteria could be to avoid revisiting cells and to move from adjacent cells only. Two interesting algorithms have been developed for this scope: The \textit{Wave-front} method \cite{Zelinsky93planningpaths} and \textit{Minimum-Spanning-Tree} (MST) method \cite{Gabriely2001}.\par
 The \textit{Wave-front} method is based upon distance transform (DT) path planning methodology. This approach considered the task of path planning to finding paths from the goal location back to the start location. The path planner propagates a distance wavefront through all free space grid cells starting from the goal cell. The distance wave front flows around obstacles and eventually through all free space in the environment.\\
  \textit{"For any starting point within the environment representing the initial position of the mobile robot, the shortest path to the goal is traced by walking down hill via the steepest descent path. If there is no downhill path, and the start cell is on a plateau then it can be concluded that no path exists from the start cell to the goal cell i.e. the goal is unreachable"} \cite{Zelinsky93planningpaths}.\\
-One significant advantage that distance transform path planning has over other path planning methods is that it can easily be induced to exhibit different types of robot navigation behaviors. In addition to the "optimum" i.e. shortest path behavior it is possible to have the "complete coverage" behavior. To achieve the complete coverage
-path planning behavior, instead of descending along the path of steepest descent to the goal, the robot follows the
-path of steepest ascent. In other words the robot moves away from the goal keeping track of the cells it has visited. The robot only moves into a grid cell which is closer to the goal if it has visited all the neighbouring cells which lie further away from the goal. An example of the complete coverage path is shown in \autoref{fig:wavefront}.
+One significant advantage that distance transform path planning has over other path planning methods is that it can easily be induced to exhibit different types of robot navigation behaviors. In addition to the "optimum" i.e. shortest path behavior it is possible to have the "complete coverage" behavior. To achieve the complete coverage path planning behavior, instead of descending along the path of steepest descent to the goal, the robot follows the path of steepest ascent. In other words the robot moves away from the goal keeping track of the cells it has visited. The robot only moves into a grid cell which is closer to the goal if it has visited all the neighbouring cells which lie further away from the goal. An example of the complete coverage path is shown in \autoref{fig:wavefront}.
 \begin{figure}[ht]
 \centering
 \begin{subfigure}{.5\textwidth}
@@ -76,7 +74,7 @@ path of steepest ascent. In other words the robot moves away from the goal keepi
 \caption{Wavefront method \cite{Zelinsky93planningpaths}}
 \label{fig:wavefront}
 \end{figure}
-The pseudocode to obtain such behavior is listed in \autoref{alg:Wavefront-distance}. \todo{valutare se mettere l'algoritmo qui o dopo}
+The pseudocode to obtain such behavior is listed in \autoref{alg:Wavefront-distance}.\par
 A nice feature of this approach is that it is possible to set both starting and goal position. This comes in handy in cleaning or lawn mowing application. However, in some case this method can not avoid revisiting cells. Another shortcoming it is worth to highlight is the high number of turn in the coverage path. This is because the path follows the "spiral" of the distance transform wave front that radiates from the goal. A solution could be to take into account other factors than only the distance from the goal.\par
 \begin{algorithm}
 	\SetKwData{SCell}{startCell}\SetKwData{CCell}{currentCell}\SetKwData{Cell}{cell}\SetKwData{Stop}{stop}\SetKwData{NeighborCell}{neighborCell}
@@ -131,9 +129,9 @@ A recent work by Song in \cite{8286947} present the \textit{$\varepsilon$-algori
 % subsection coverage_path_planning_for_mobile_robots (end)
 \subsection{Aerial Coverage using UAVs} % (fold)
 \label{sub:aerial_coverage_using_uavs}
-In aerial coverage the CPP methods presented in \autoref{sub:coverage_path_planning_for_mobile_robots} have been largely adopted. In this application the environment is specified as a grid or a polygon using GPS coordinates for polygon nodes or for the center of the cells. Obstacles are generally neglected as the flight altitude is usually high enough to avoid unwanted collision. Anyway in aerial coverage there are often uninterested regions which is out of interest in the coverage task but flight over them is allowed. For example for the specific coverage required in BambiSaver a lake is of no interest as no animals hide there. An important factor in aerial coverage using UAV is the limited flight time of the vehicle. For this reason generating an efficient path is of great importance. Along with shortening the path limiting as much as possible sensor overlap, it is relevant to minimize the number of turns in the flight trajectory. Reducing the number of turnings will produce trajectory that consist of long straight stripes. This kind of trajectory let the robot to maintain as long as possible the cruise speed, reducing acceleration and consequently power consumption.
+In aerial coverage the CPP methods presented in \autoref{sub:coverage_path_planning_for_mobile_robots} have been largely adopted (e.g. Moon \textit{et al.} in \cite{HGJHC0_2009_v10n2_1} used the Boustrophedon approach for crop dusting with multicopter). In this application the environment is specified as a grid or a polygon using GPS coordinates for polygon nodes or for the center of the cells. Obstacles are generally neglected as the flight altitude is usually high enough to avoid unwanted collision. Anyway in aerial coverage there are often uninterested regions which is out of interest in the coverage task but flight over them is allowed. For example for the specific coverage required in BambiSaver a lake is of no interest as no animals hide there. An important factor in aerial coverage using UAV is the limited flight time of the vehicle. For this reason generating an efficient path is of great importance. Along with shortening the path limiting as much as possible sensor overlap, it is relevant to minimize the number of turns in the flight trajectory. Reducing the number of turnings will produce trajectory that consist of long straight stripes. This kind of trajectory let the robot to maintain as long as possible the cruise speed, reducing acceleration and consequently power consumption.
 
-% The general CPP methods introduced in Chapter 2.2.1 have been applied directly to aerial coverage often in an offline setting. In these works, the target area is specified as a polygon or grid with GPS coordinates of the polygon nodes or grid center. It is usually assumed that the UAV is flying at an altitude which is safe and hence there is no risk of c{}olliding with an obstacle. However sometimes some parts of the environment are treated as no-flying zones which should be avoided by the UAV. Therefore in CPP for UAVs, these subregions are dealt with as obstacles. Another type of region that might be present in aerial coverage is uninteresting regions. Flying in these regions is allowed but does not contribute to the coverage goal i.e. covering them is of no value. For example in a outdoor crop mapping task with a quadrotor, covering the lake is unnecessary but flying over it (for example to reach the other side of the lake) is allowed.\\
+% The general CPP methods introduced in Chapter 2.2.1 have been applied directly to aerial coverage often in an offline setting. In these works, the target area is specified as a polygon or grid with GPS coordinates of the polygon nodes or grid center. It is usually assumed that the UAV is flying at an altitude which is safe and hence there is no risk of c{}olliding with an obstacle. However sometimes some parts of the environment {}are treated as no-flying zones which should be avoided by the UAV. Therefore in CPP for UAVs, these subregions are dealt with as obstacles. Another type of region that might be present in aerial coverage is uninteresting regions. Flying in these regions is allowed but does not contribute to the coverage goal i.e. covering them is of no value. For example in a outdoor crop mapping task with a quadrotor, covering the lake is unnecessary but flying over it (for example to reach the other side of the lake) is allowed.\\
 % As mentioned before, due to the very short flight time of UAVs, generating efficient coverage paths is useful. To reach efficiency, existing methods try to avoid unnecessary coverage, i.e. they try to minimize the overlap in the sensor footprint along the produced trajectory. This goal will consequently reduce the path length. Another element considered by some existing methods is to minimize the number of turns in the flight trajectory. Reducing the number of turnings will consequently produce trajectories that consist of long straight stripes, as is the case in Lawnmower pattern. Therefore, when a robot follows the trajectory it can maintain a constant velocity in a large part of the coverage path and it only accelerates or de-accelerates when it is turning. The overall outcome is less power consumption. Such efficient coverage trajectories can be planned offline when the environment is known a priori. Some of these methods, aimed for aerial coverage, are presented in the following section which includes planning for both single and multi-robot systems. However, when no prior knowledge about the target area is available, the planning has to be done online based on the real-time sensory data.\\
 % In the following, we present the existing methods of coverage trajectories planning for unmanned aerial vehicles. We partition the approaches into two main groups: a) methods that precompute the trajectory based on a priori knowledge of the environment and b) methods that adaptively re-plan the trajectory based on on-line sensory data.
  % subsection aerial_coverage_using_uavs (end)
@@ -221,9 +219,9 @@ The \textit{Coverage Path Planner} node task can be further divided in five sub-
 	\item Choosing Starting Position
 	\item Wave-front Propagation Algorithm;
 	\item Coverage Path Generator;
-	\item Spline Interpolation;
-\end{enumerate*}
- In the following sections, first the definition of relevant \acrshort{ros} messages is given, then each sub-task is analyze separately. For parts where coding has required additional steps and consideration the implementation is analyze more in details, otherwise only the pseudocode is given for clarity and readability reasons. Anyway the whole code is accessible on the project GitHub page \cite{bambiProjectGit}.
+	\item Spline Interpolation.
+\end{enumerate*}\par
+In the following sections, first the definition of relevant \acrshort{ros} messages is given, then each sub-task is analyze separately. For parts where coding has required additional steps and consideration the implementation is analyze more in details, otherwise only the pseudocode is given for clarity and readability reasons. Anyway the whole code is accessible on the project GitHub page \cite{bambiProjectGit}.
 \subsubsection{Relevant Messages Definition} % (fold)
 \label{ssub:relevant_messages_definition}
 Ros nodes communicate using messages over different topics. There are many build-in messages already defined in \acrshort{ros}, anyway it has been necessary to define custom messages for the specific use case. The definition of relevant messages is given in \autoref{list:msg-CPP}
@@ -235,7 +233,7 @@ The \textit{coverage path planner} node receives the \textsf{FieldCoverageInfo} 
 \subsection{Approximate Cellular Decomposition} % (fold)
 \label{sub:approximate_cellular_decomposition}
 In this section it is analyze how to decompose the workplace so that it can be represented as a grid of squared cells.\\
-The cells dimension has been already computed as discussed before, thus the grid dimensions are simply obtained measuring the maximum field dimensions along the horizontal and vertical axis and dividing by the cell dimension. The result of both divisions is rounded up in order to guarantee that in any case the field is smaller than the grid. The cells of the rectangular matrix so obtained, have to be marked depending on whether they are part of the field or not. The strategy adopted is to represent both the field and the cell of the grid as polygons ??living??\todo{existing, living??} in the same coordinates reference system. To check if a particular cell belongs to the workplace the intersection between the two polygons is performed. If the intersection exists the cell under consideration is part of the field, otherwise it is not. The \textit{approximate cellular decomposition} of the target area is so achieved. The \autoref{alg:Bambi-grid-decomposition} explain formally how to construct the grid representing the working field.
+The cells dimension has been already computed as discussed before, thus the grid dimensions are simply obtained measuring the maximum field dimensions along the horizontal and vertical axis and dividing by the cell dimension. The result of both divisions is rounded up in order to guarantee that in any case the field is smaller than the grid. The cells of the rectangular matrix so obtained, have to be marked depending on whether they are part of the field or not. The strategy adopted is to represent both the field and the cell of the grid as polygons in the same coordinates reference system. To check if a particular cell belongs to the workplace the intersection between the two polygons is performed. If the intersection exists the cell under consideration is part of the field, otherwise it is not. The \textit{approximate cellular decomposition} of the target area is so achieved. The \autoref{alg:Bambi-grid-decomposition} explain formally how to construct the grid representing the working field.
 \begin{algorithm}[tbh]
 	\SetKwData{x}{x}\SetKwData{l}{cellDimension}\SetKwData{LB}{leftBorderE}\SetKwData{RB}{rightBorderE}\SetKwData{BB}{bottomBorderN}\SetKwData{TB}{topBorderN}\SetKwData{w}{width}\SetKwData{h}{height}\SetKwData{nE}{nE}\SetKwData{nN}{nN}\SetKwData{Matrix}{M}\SetKwData{FieldP}{fieldPoly}\SetKwData{CellP}{cellPoly}
 	\SetKwFunction{getPolygonFromMatrixCell}{getPolygonFromMatrixCell}\SetKwFunction{Ceil}{ceil}
@@ -272,7 +270,6 @@ The implementation of the cellular decomposition in C++ begins with the conversi
 In practice the conversion is achieved using the \textsf{geodesy} ROS package (see \cite{geodesyROS}).\par
 The polygon is represented with the C++ type \textsf{boostFieldBorderPolygon} which is part of the \textsf{Boost.Geometry} library \cite{boostGeometryLib}. To define it is just required to add point-by-point the outer contour. A snapshot of the code which perform this first part of the decomposition is given in \autoref{list:cellular-decompostion-CPP}.\par
 The code implementing the \autoref{alg:Bambi-grid-decomposition} is not listed because it do not add anything relevant to what already seen in the pseudocode except the specific C++ syntax and definition. An example of the output matrix is displayed in \autoref{fig:field3-decomposition-matrix} where the cells which are part of the field are marked with "XX" otherwise with "-2".
-\todo{decidere se invece inserirlo, c'e gia il listing in listing/C3}
 \lstinputlisting[label=list:cellular-decompostion-CPP, caption=Coordinates transformation and polygon construction in C++ , language=C++]{listings/C3/cellular-decomposition-1.cpp}
 \begin{figure}[ht]
     \centering
@@ -280,14 +277,12 @@ The code implementing the \autoref{alg:Bambi-grid-decomposition} is not listed b
     \caption{Example of Cellular Decomposition Matrix}
     \label{fig:field3-decomposition-matrix}
 \end{figure}
-\todo{aggiungere immagine campo da satellite}
 
 % subsubsection implementation (end)
 % subsection approximate_cellular_decomposition (end)
 \subsection{Choosing Starting Position} % (fold)
 \label{sub:choosing_starting_position}
 For this specific use case there is no constraint in the choice of the starting position other that it should be inside the target area. Hence it makes sense to select a smart starting position so that the path planner could generate an efficient path. After some test it seems that a good starting position is the one corresponding to the most isolated cell. Isolated in the sense that it is the cell with the lowest number of neighbors having the same cost. Among all the candidate cells, it is selected the one having the higher cost value (i.e the furthest from the goal cell).
-\todo{Fare algoritmo per starting cell selection???}
 
 % subsection choosing_starting_position (end)
 \subsection{Wave-front Propagation Algorithm} % (fold)
@@ -357,10 +352,10 @@ The initial wavefront is $ W_0$, which represents the states where the current c
 \subsection{Coverage Path Generator} % (fold)
 \label{sub:coverage_path_generator}
 Once the elements matrix has been filled according to the cost function, the last step is to generate the path which assure that each cell is visited. This is done through a gradient ascending searching algorithm from the start cell. All the unvisited neighbors of the current cell are evaluated and for each is given a \textit{priority}. The neighbor having the higher priority is appointed and selected as the current cell for the next step of the iteration. The process continues until there are no more unvisited neighbors.\par
-\textit{Priority} function takes into account different features of the neighbors cells which are in order of weight \todo{weight / importance??}:
+\textit{Priority} function takes into account different features of the neighbors cells which are in order of relevance:
 \begin{enumerate}
 	\item The cost function value associated to that cell
-	\item How many adjacent cells have the same value, prediligendo\todo{trovare termine + capire meglio questione del local minimum} the neighbor which have the lower number of same value adjacent cells. This is to avoid as much as possible to reach a local minimum which cause the algorithm to stack.
+	\item How many adjacent cells have the same value, favoring the neighbor which has the lower number of same value adjacent cells. This is to avoid as much as possible the risk of reaching a local minimum which could cause the algorithm to stack.
 	\item The Von Neumann neighbors are preferred, i.e the diagonal neighbors have less priority because they are a little farther ($\sqrt{2}\,l$ instead of just $l$ as for Von Neumann neighbors)
 \end{enumerate}
 The pseudocode which plan the coverage path is listed in \autoref{alg:Bambi-pathPlanner}.\\
@@ -405,7 +400,11 @@ The pseudocode which plan the coverage path is listed in \autoref{alg:Bambi-path
 \label{sub:spline_interpolation}
 The resulting coverage path is a piecewise function in the local reference system made up of segment connecting the center of the cells in the order provided by the algorithm shown in \autoref{sub:coverage_path_generator}. Therefore the outcome path is really sharply and edgy. Before sending the trajectory to the vehicle it is then required to smooth it. This is done using spline interpolation. Spline interpolation is a form of interpolation where the interpolant is a special type of piecewise polynomial called a spline. This subject goes outside the  scope of the thesis, thus only the implementation is given.
 
-\begin{figure}[ht]
+
+\subsubsection{Implementation} % (fold)
+\label{ssub:implementation}
+The implementation in C++ relay on the \textit{cpp-spline} Library provided by Xianshun Chen who make it available on GitHub \cite{cpp-spline}. \autoref{fig:CPP-matlab} shows the path before and after the interpolation. The smoothing effect is evident since the algorithm produce a piecewise function imposing continuity up to second order derivative. This positive features comes at the expenses of accuracy, because the resulting spline does not exactly pass through every given point as evidenced in \autoref{fig:interpolation-error}. Fortunately this inaccuracy has a little impact on coverage performance due to sensor overlap considered in the computation of the flight altitude (see \autoref{sub:workplace_sampling}).
+\begin{figure}[H]
 \centering
 \begin{subfigure}{.49\textwidth}
   \centering
@@ -422,12 +421,9 @@ The resulting coverage path is a piecewise function in the local reference syste
 \caption{CPP path (\subref{sfig:CPP-path-matlab})before and (\subref{sfig:CPP-path-spline-matlab})after interpolation}
 \label{fig:CPP-matlab}
 \end{figure}
-\subsubsection{Implementation} % (fold)
-\label{ssub:implementation}
-The implementation in C++ relay on the \textit{cpp-spline} Library provided by Xianshun Chen who make it available on GitHub \cite{cpp-spline}. \autoref{fig:CPP-matlab} shows the path before and after the interpolation. The smoothing effect is evident since the algorithm produce a piecewise function imposing continuity up to second order derivative. This positive features comes at the expenses of accuracy, because the resulting spline does not exactly pass through every given point as evidenced in \autoref{fig:interpolation-error}. Fortunately this inaccuracy has a little impact on coverage performance due to sensor overlap considered in the computation of the flight altitude (see \autoref{sub:workplace_sampling}).
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{figures/C3/Interpolation-error.eps}
+    \includegraphics[width=0.39\textwidth]{figures/C3/Interpolation-error.eps}
     \caption{Interpolation error}
     \label{fig:interpolation-error}
 \end{figure}

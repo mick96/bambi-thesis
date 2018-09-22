@@ -13,7 +13,7 @@ The simulation environment consist of:
  	\item \textbf{\acrshort{qgc}}: the ground control station used to send the mission start/stop (see appendix \ref{appendix:mavlink}) command and to monitor all the \acrshort{uav} parameters during flight.
  \end{itemize}
  The different parts of the system (\autoref{fig:SITL-architecture}) are connected via UDP, and can be run on either the same computer or another computer on the same network. The communication protocol is MAVLink (see appendix \ref{appendix:mavlink}). \\
- The following simulations has been carried out on a single PC running Ubuntu 16.04LST.
+ The following simulations has been carried out on a single PC running Ubuntu 16.04 LST.
  \begin{figure}[ht]
     \centering
     \includegraphics[width=.7\textwidth]{figures/C4/Px4_sitl_overview}
@@ -21,7 +21,7 @@ The simulation environment consist of:
     \label{fig:SITL-architecture}
 \end{figure}
 
-Gazebo offers the possibility to load a satellite map through the \textsf{StaticMap} plugin\footnote{documentation at \url{http://gazebosim.org/tutorials?tut=static_map_plugin&cat=build_world}}. In this way the simulation environment (\autoref{fig:gazebo-Map}) represents \todo{depicts????} quite accurately the real world scenario.
+Gazebo offers the possibility to load a satellite map through the \textsf{StaticMap} plugin\footnote{documentation at \url{http://gazebosim.org/tutorials?tut=static_map_plugin&cat=build_world}}. In this way the simulation environment (\autoref{fig:gazebo-Map}) represents quite accurately the real world scenario.
 The vehicle used in simulation environment is the 3DR Iris (\autoref{fig:gazebo-iris}), because its model was already created by PX4 team along with different sensors like the 2D 360\degree\ lidar that was used to test object avoidance.
 \begin{figure}[ht]
   \centering
@@ -152,9 +152,10 @@ Possible \textit{solutions} could be:
 % subsubsection errors_analysis (end)
 \section{Final Considerations} % (fold)
 \label{sec:considerations}
-Overall, the generated path (assuming a smart selection of start and goal point) is satisfactory for the desired purpose even if, in some section, there are turns which would be nice to avoid. This is accentuated especially when the workplace has a complex shape (\autoref{sfig:F2-CPP-path}). This shortcoming is something expected, in fact, at the actual development stage only the distance from the goal point is used as cost function in the wave-front propagation algorithm, therefore no optimization for reducing turns has been implemented (see \autoref{sub:wave_front_propagation_algorithm}). The distance transformation used, in fact, leads to a spiral like behavior near the goal cell (discussed in \autoref{ssub:grid_based_methods}), thus it is convenient to set the goal position (home position in the mission) at an extremity of the field. \par
-The issue discussed in \autoref{sub:errors_analysis} could cause real problem if at the border of the field there are obstacles risking to make the \acrshort{uav} crash. This, at the actual state of development, is partially addressed relying on the \textit{object avoidance} system that has been implemented inside \textit{PX4 Firmware} which, using potential field, try to push the drone away from surrounding obstacles.\par
+Overall, the generated path (assuming a smart selection of start and goal point) is satisfactory for the desired purpose even if, in some section, there are turns which would be nice to avoid. This is accentuated especially when the workplace has a complex shape (\autoref{sfig:F2-CPP-path}). This shortcoming is something expected, in fact, at the actual development stage, in the wave-front propagation algorithm, only the distance from the goal point is used as cost function, therefore no optimization for reducing turns has been implemented (see \autoref{sub:wave_front_propagation_algorithm}). The distance transformation used, leads to a spiral like behavior near the goal cell (discussed in \autoref{ssub:grid_based_methods}), thus it is convenient to set the goal position (home position in the mission) at an extremity of the field. \par
+Regarding the issue discussed in \autoref{sub:errors_analysis}, it could cause real problem if at the border of the field there would be obstacles risking to make the \acrshort{uav} crash. This, at the actual state of development, is partially addressed relying on the \textit{object avoidance} system that has been implemented inside \textit{PX4 Firmware} which, using potential field, try to push the drone away from surrounding obstacles.\par
 Finally, considering that the average flight time of a mid-range drone is between $15$ to $20$ minutes and assuming a flight mean velocity of about $4.5\, m/s$ during the mission duration, the distance it can travel is in the range of $4-5.4\, Km$. This distance is enough to cover a $4\, Ha$ field (\autoref{tbl:fields-area-length}).
+
 % subsubsection considerations (end)
 
 
