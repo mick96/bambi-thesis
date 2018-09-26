@@ -41,6 +41,10 @@
 \usepackage[toc,acronym]{glossaries}
 \usepackage{gensymb}
 \usepackage{float}
+\usepackage{pdfpages} 
+\floatstyle{plain}
+\newfloat{Code}{H}{myc}
+
 % Set listing style
 \lstdefinestyle{mystyle}{
 captionpos=b,
@@ -98,6 +102,8 @@ belowskip=20pt
 \renewlistof\listoftables{lot}{\listtablename}
 \renewlistof\lstlistoflistings{lstlol}{\lstlistlistingname}
 
+\raggedbottom
+
 \input{title-page}
 \makeatother
 
@@ -132,16 +138,10 @@ belowskip=20pt
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 \hypersetup{pageanchor=false}
-\maketitle
+% \maketitle
+\includepdf[pages=-]{bambithesis-frontespizio.pdf}
 
-%%%%%%%%%%%%%% REMOVE ME %%%%%%%%%%%%%%%%%
-\thispagestyle{empty}
-\listoftodos
-\pagenumbering{roman}
-\setcounter{page}{1}
-\newpage
-% %%%%%%%%%%%%%% REMOVE ME %%%%%%%%%%%%%%%%%
-
+	
 % \thispagestyle{empty}
 % \setcounter{page}{2}
 % \cleardoublepage
@@ -153,16 +153,16 @@ belowskip=20pt
 \thispagestyle{plain}
 \setcounter{page}{3}
 
-
-(CPP)
-This task is fundamental to many robotic applications such as cleaning, painting, underwater operations, mine sweeping, lawn mowing, agriculture, monitoring, searching, and rescue operations. 
-
-
-It is implemented the grid based cellular decomposition, which is an approximate cellular decomposition approach, for the purposes of coverage. Coverage  path is calculated using wavefront propagation starting from the goal point. The algorithm could be adapted so that it take into consideration different path feature, e.g minimum number of turns, shortest path, terrain elevation profile. An important aspect especially in \acrshort{uav} application where the limited battery life force the trajectory to be as efficient as possible.
-
+Environment representation and path planning are two major issues in any navigation systems.
+This thesis discuss those issues in the specific use case regarding search and rescuing operation over agricultural area.\par
+First, it is analyzed the process of image orthoretification and KML (Keyhole Markup Language) file format for representing geographical features, i.e the field boundary.
+% , then it focus on Coverage Path Planning strategies.
+Orthorectification is the process of correcting geometrical distortions of an image such that the scale is uniform and it can be use to obtain environment-specific information which are later encoded in KML.\par
+Successively, the focus moves on Coverage Path Planning (CPP) that is the operation of finding a path covering all the points of a specific area. This task is fundamental to many robotic applications such as cleaning, painting, mine sweeping, monitoring, searching and rescue operations. The proposed approach is implemented in Robot Operating System (ROS) and it is based on approximate cellular decomposition of the environment. The coverage path is calculated using distance transform which propagates around the goal point in a wavefront. The algorithm could be adapted to optimize different path features (e.g. number of turns, path length), an important aspect especially in \acrshort{uav} application where the limited battery life requires the trajectory to be as much efficient as possible.\par
+The results obtained in a simulated environment are satisfactory and even if the outcome path is not always optimal, it shows the versatility of the algorithm when applied to different field geometries.
 
 \vskip 2em
-\keywords{One, Two}
+\keywords{Georeferencing, Orthophoto, Coverage Path Planning (CPP), Approximate Cellular Decomposition, Unmanned Air Vehicles (UAV)}, copters
 \end{abstract}
 
 \thispagestyle{empty}
@@ -175,9 +175,15 @@ It is implemented the grid based cellular decomposition, which is an approximate
 \addcontentsline{toc}{chapter}{Abstract (italiano)}{}{}
 \thispagestyle{plain}
 \setcounter{page}{5}
-\lipsum[44]
+La rappresentazione dell'area di lavoro e la pianificazione del percorso sono due aspetti importanti in qualsiasi sistema di navigazione.
+Questa tesi si propone di discutere tali questioni nello specifico ambito delle operazioni di ricerca e salvataggio della fauna selvatica su suolo agricolo.\par
+Inizialmente, viene analizzato il processo di ortorettificazione di immagini e presentato KML (Keyhole Markup Language) quale formato standard di rappresentazione di dati geografici.
+L'ortorettificazione consiste nel correggere distorsioni geometriche dell'immagine così da rendere la scala uniforme e usarla per ottenere informazioni specifiche sul campo di lavoro da codificare successivamente in KML.\par
+Proseguendo, l'attenzione si sposta sulla Pianificazione del Percorso di Copertura (CPP), ovvero su quell'operazione che consente di trovare il percorso che copra tutti i punti di un'area designata e che per tale aspetto risulta fondamentale in differnti applicazioni in robotica quali pulizia, pittura, disinnesco mine, monitoraggio, e operazioni di ricerca e salvataggio. L'approccio proposto è implementato su ROS (Robot Operating System) e si basa sulla decomposizione approssimata dell'area in celle. Il tracciato di copertura è calcolato tramite una trasformazione della distanza che si espande dal punto d'arrivo in un fronte d'onda. L'algoritmo può essere adattato per ottimizzare diverse caratteristiche della traiettoria generata (e.g. numero di curve, lunghezza del percorso), aspetto importante specialmente per applicazioni riguardanti \acrshort{uav} dove la limitata durata della batteria necessita che la traiettoria sia la più efficiente possibile. \par
+I risulatati ottenuti in ambiente simulato sono soddisfacenti e, nonostante il percorso generato non sia sempre quello ottimo, diversi test svolti su campi di forma e dimensione diversi dimostrano la versatilità dell'algoritmo.
+
 \vskip 2em
-\keywords{Uno, Due}
+\keywords{Georeferenziazione, Ortofotografia, Pianificazione Percorso di Copertura (CPP), Aeromobile a Pilotaggio Remoto (APR)}
 \end{abstract}
 
 
@@ -201,28 +207,18 @@ It is implemented the grid based cellular decomposition, which is an approximate
 \pagenumbering{arabic}
 \renewcommand{\thechapter}{\Roman{chapter}}
 \renewcommand*\thesection{\arabic{section}}
-
-
 \chapter{Introduction} % (fold)
 \label{cha:introduction}
-
 \input{c1-introduction}
-
 % chapter introduction (end)
-
-
-
 \chapter{Georeferencing the mission's environment} % (fold)
 \label{cha:georeferencing_the_mission_s_environment}
 \input{c2-orthophoto}
 % chapter georeferencing_the_mission_s_environment (end)
-
-
 \chapter{Coverage Path Planning} % (fold)
 \label{cha:coverage_path_planning}
 \input{c3-CPP}
 % chapter coverage_path_planning (end)
-
 \chapter{Simulation Results} % (fold)
 \label{cha:simulation_results}
 \input{c4-SimulationResults}

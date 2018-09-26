@@ -53,7 +53,7 @@ The position accuracy of Google Earth was analyzed by Ahmed Ghazi whose selected
 town. As of October 2012 The root mean square of the error results to be about $1.80m$ for horizontal position and $1.773m$ for height estimation.\cite{PosAccuracyGE} These results, while referring to only a specific region of the earth, are representative of the goodness of the data, especially considering they are available for free.\\
 % subsection google_earth (end)
 % section georeferenced_photo (end)
-
+\pagebreak
 \section{Border Representation and Detection} % (fold)
 \label{sec:border_detection_and_representation}
 In order to obtain a digital representation of the border it is, first of all, important to define how to store the data in a file. Google Earth file format is the \acrfull{kml}.
@@ -75,23 +75,22 @@ It became an international standard maintained by the Open Geospatial Consortium
 \end{itemize}
 
 From a technical point of view, \acrshort{kml} uses a tag-based structure based on \acrshort{xml} standard \cite{bray06xml11}. All tags are case-sensitive and must be taken from the "\acrshort{kml} Reference"\footnote{available at \url{https://developers.google.com/kml/documentation/kmlreference}}. \autoref{fig:KML-diagram} shows the most important attribute of a \acrshort{kml} object. There are many object types, but for the application under interest some basic types like placemarks/points and lines are enough.
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/C2/KML-classTree.png}
     \caption{KML Object Hierarchy Diagram}
     \label{fig:KML-diagram}
 \end{figure}
-
 % subsection kml_google_earth_file_format (end)
-
 \subsection{Field Border in KML} % (fold)
 \label{sub:field_border_in_kml}
-A border it is basically a close path having an undefined shape and therefore it cannot be represented using one polygon or other predefined geometric shapes. In \acrshort{kml} such kind of geometric path should be defined through the object \textsf{LineString}. \textsf{LineString} creates a path from a set of geographic points. Each adjacent point is connected with a line and finally if the ending point coincide with the starting one a close path is obtained. Clearly, this approach required an adequate number of points to make the resulting shape smooth. Fortunately, the generation of the points is automatically done by Google Earth which provides an handy toolbox to graphically create a path object directly drawing it over the map.
+A border it is basically a close path having an undefined shape and therefore it cannot be represented using one polygon or other predefined geometric shapes. In \acrshort{kml} such kind of geometric path should be defined through the object \textsf{LineString}. \textsf{LineString} creates a path from a set of geographic points. Each adjacent point is connected with a line and finally if the ending point coincide with the starting one a close path is obtained. Clearly, this approach required an adequate number of points to make the resulting shape smooth. Fortunately, the generation of the points is automatically done by Google Earth which provides an handy toolbox to graphically create the path object directly drawing it over the map.
 An example of a field contour encoded in \acrshort{kml} code is reported in \autoref{list:border-KML}, where the complete list of coordinates has been omitted as it would be too long.
-\todo{sistemare impaginazione listing}
+\begin{Code}
 \lstinputlisting[label=list:border-KML, caption=Border in KML, language=XML]{listings/C2/border-valentino-field.kml}
+\end{Code}
 
-Using the \textsf{name} and \textsf{description} tags gives the possibility to add meta-data to the \acrshort{kml} geographic feature. This comes in handy to classify the field and creating a database of the place already visited. The idea is then to use the data already collected when repeating mission in a previously scanned field.
+The \textsf{name} and the \textsf{description} tags give the possibility to add meta-data to the \acrshort{kml} geographic feature. This comes in handy to classify the field and creating a database of the place already visited. The idea is then to use the data already collected when repeating mission in a previously scanned field.
 Before entering in the implementation details an example of how the contour appears in Google Earth is displayed in \autoref{fig:waldpeter-boundary-GE}.
 \begin{figure}[ht]
     \centering
@@ -102,7 +101,7 @@ Before entering in the implementation details an example of how the contour appe
 
 \section{Implementation} % (fold)
 \label{sec:implementation}
-As it was accennato in \ref{sub:ortho_rectification} although the source of the orthophoto used in the software implementation is Google Earth, in defining the mission it has been considered the possibility to take a photo of the whole field and georeference it (that is the goal of \textsf{optical\_cam} node). This would provide an up-to-date and eventually more accurate image, but at the same time the orthophoto generation is computationally heavy especially for a mini PC. This in addition to the limited flight time of the quadcopter suggest to use Google imagery database.\par
+As it was mentioned in \ref{sub:ortho_rectification} although the source of the orthophoto used in the software implementation is Google Earth, in defining the mission it has been considered the possibility to take a photo of the whole field and georeference it. This would provide an up-to-date and eventually more accurate image, but at the same time the orthophoto generation is computationally heavy especially for a mini PC. This in addition to the limited flight time of the quadcopter suggest to use Google imagery database.\par
 In the following section it is explained how this part of the mission has been implemented in \acrshort{ros}. The most relevant part concerns the representation of the field contour as \acrshort{ros} message and the way to import it given the respective \acrshort{kml} file.
 
 \subsection{ROS Nodes Architecture} % (fold)
@@ -110,7 +109,7 @@ In the following section it is explained how this part of the mission has been i
 \autoref{fig:field-detection-rqt} shows how the three \acrshort{ros} nodes (\textsf{mission\_controller}, \textsf{optical\_cam} and \textsf{boundary\_generator}), displayed as ovals, communicate together through the four topics represented inside rectangles. The node named \textsf{mavros} (for more details see appendix \ref{appendix:mavros}) on the left side of the diagram, manages everything regarding the communication with the aircraft. It basically provide a \acrshort{ros} interface to read the vehicle status variables and to change the flight controller behaviors.\par
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1.3\textwidth]{figures/C2/fieldDetection-rqt_graph.pdf}
+    \includegraphics[width=1.1\textwidth]{figures/C2/rosgraph-ortho.png}
     \caption{Nodes and Topics concurring in generating the field contour}
     \label{fig:field-detection-rqt}
 \end{figure}
@@ -150,7 +149,7 @@ In the following implementation the boundary information is taken from a \acrsho
 The code of this node is integrally reported in \autoref{list:boundary_generator}.\par
 First of all the node subscribes to \textsf{mission\_controller/trigger\_boundary} in such a way that upon the arrival of a trigger message the callback function \textsf{cb\_boundary\_trigger} is called. The callback function get the absolute path of the \acrshort{kml} file from the message attribute \textsf{filenameWithFullPath}. Now it comes to play the pyKML library.\par
 pyKML is a Python package for creating, parsing, manipulating, and validating \acrshort{kml} documents \cite{pyKML}. It is based on the \textsf{lxml.objectify} API\footnote{It aims to hide the usage of \acrshort{xml} behind normal Python objects, sometimes referred to as data-binding. It allows you to use \acrshort{xml} as if you were dealing with a normal Python object hierarchy.\cite{lxml}} which provides access to \acrshort{xml} documents in python program. Once the file has been opened it is possible to access to \acrshort{kml} child member in the way shown at line 23 of \autoref{list:boundary_generator}. At this point it is just a matter of parsing each geographic point as it was a string in the form "<latitude>, <longitude>" using the function \textsf{split(',')}.
-Latitude and longitude coordinate for each point of the contour is then packed in a \textsf{geoPosition2D} object which is push back on the \textsf{boudary\_path} vector. Once every point has been parsed and the vector filled the \textsf{Field} \acrshort{ros} message is published completing the node's job.
+Latitude and longitude coordinate for each point of the contour is then packed in a \textsf{geoPosition2D} object which is push back on the \textsf{boudary\_path} vector. Once every point has been parsed and the vector filled the \textsf{Field} \acrshort{ros} message is published and the node finishes its job.
 \lstinputlisting[label=list:boundary_generator, caption=boundary generator
  node in python, language=python]{listings/C2/boundary_generator.py}.
 

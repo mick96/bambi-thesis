@@ -126,9 +126,9 @@ Finally in \autoref{sfig:F3-regular-start-pos} the starting cell is chosen looki
 Looking at the three coverage paths in \autoref{fig:Coverage-pathGE} one can notice that in some section at the border, the trajectory exceed the boundary (represented as black line). This phenomenon is a drawback of the approximate cellular decomposition (see \autoref{sub:approximate_cellular_decomposition}. The algorithm, in fact, marks a cell as part of the field when the intersection between the square polygon of the cell and the field polygon
 exist. This cause the cells locate at the edge of the workplace to be marked as field even if just a small portion of them are actually inside the field. This approximation leads to imperfections in the path as shown in \autoref{fig:CPP-imperfections}. The larger are the cells, the greater becomes the effect because the approximation gets worse. For instance using $10 \times 10\, m$ cells the trajectory goes outside the border of a distance as high as $9\, m$.\par
 Possible \textit{solutions} could be:
- \begin{enumerate*}
-	\item Using a grid with smaller cell,thus increasing the sensor overlap;
-	\item Considering a threshold on the intersecting area under which the cell it is no considered as part of the field. This could lead to a not complete coverage of the target area.
+ \begin{enumerate*}[label={(\arabic*)}]
+	\item Using a grid with smaller cell, thus increasing the sensor overlap;
+	\item Considering a threshold on the intersecting area under which the cell it is not considered as part of the field. This could lead to a not complete coverage of the target area.
 	\item In the algorithm handle external cells as particular case and using as waypoint not the center but a point inside the workplace.
 \end{enumerate*}
 

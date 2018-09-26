@@ -18,8 +18,7 @@ Mavros package implements a MAVLink extendable communication node for ROS with U
     \label{fig:mavros-diagram}
 \end{figure}
 Through mavros it is possible to communicate with the flight controller (\autoref{fig:mavros-diagram}) simply publishing over the topic subscribed by mavros or making a call to the services it provides.
-The package is made up of various plugins, each handling different part \todo{trovare sinonimo di part} of the FCU.
+The package is made up of various plugins, each handling different components of the FCU.
 Every plugin can be load and configure separately when starting mavros through \textit{launch} file. Inside the package there are already some sample launch files specifically created to configure the communication with PX4 or APM flight stack.
-\todo{listare i plugin usati con PX4.launch???}
 
 % chapter mavros (end)
